@@ -7,7 +7,7 @@ const swaggerUiOptions = {
     definition: {
         openapi: '3.0.3',
         info: {
-            title: 'Flowise APIs',
+            title: 'GrowthEffect APIs',
             summary: 'Interactive swagger-ui auto-generated API docs from express, based on a swagger.yml file',
             version: '1.0.0',
             description:
@@ -17,14 +17,14 @@ const swaggerUiOptions = {
                 url: 'https://github.com/FlowiseAI/Flowise/blob/main/LICENSE.md'
             },
             contact: {
-                name: 'FlowiseAI',
+                name: 'GrowthEffect',
                 email: 'support@flowiseai.com'
             }
         },
         servers: [
             {
                 url: 'http://localhost:3000/api/v1',
-                description: 'Flowise Server'
+                description: 'GrowthEffect Server'
             }
         ]
     },
