@@ -1,15 +1,14 @@
 {
-    "name": "flowise-ui",
-    "version": "2.1.4",
+    "name": "growtheffect-ui",
+    "version": "1.0.0",
     "license": "SEE LICENSE IN LICENSE.md",
-    "homepage": "https://flowiseai.com",
+    "homepage": "https://www.growtheffect.co",
     "workspaces": [
     "packages/*"
   ],
   "packageManager": "pnpm@9.13.2",
     "author": {
-        "name": "HenryHeng",
-        "email": "henryheng@flowiseai.com"
+        "name": "CanOnurBuyuk"
     },
     "dependencies": {
         "@codemirror/lang-javascript": "^6.2.1",

@@ -1,8 +1,8 @@
 {
-    "name": "flowise",
-    "version": "2.1.4",
+    "name": "growtheffect",
+    "version": "1.0.0",
     "private": true,
-    "homepage": "https://flowiseai.com",
+    "homepage": "https://www.growtheffect.co",
     "workspaces": [
         "packages/*",
         "flowise",
@@ -28,6 +28,9 @@
     },
     "lint-staged": {
         "*.{js,jsx,ts,tsx,json,md}": "eslint --fix"
+    },
+    "dependencies": {
+        "bcryptjs": "^2.4.3"
     },
     "devDependencies": {
         "@babel/preset-env": "^7.19.4",
@@ -100,8 +103,5 @@
                 }
             ]
         ]
-    },
-    "dependencies": {
-        "http-status-codes": "^2.3.0"
     }
 }

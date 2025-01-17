@@ -2,20 +2,8 @@ import { Request, Response } from 'express'
 import { User } from '../database/entities/User'
 import { getRunningExpressApp } from './getRunningExpressApp'
 import { InternalFlowiseError } from '../errors/internalFlowiseError'
-//import { StatusCodes } from 'http-status-codes';
+import { StatusCodes } from 'http-status-codes';
 import { getErrorMessage } from '../errors/utils'
-
-/**
- * Verify valid passwords
- * @param {string} storedPass
- * @param {string} customPass
- * @returns {boolean}
- */
-export const comparePasswords = (storedPass: string, customPass: string): boolean => {
-    const [hashedPassword, salt] = storedPass.split('.')
-    const buffer = scryptSync(customPass, salt, 64) as Buffer
-    return timingSafeEqual(Buffer.from(hashedPassword, 'hex'), buffer)
-}
 
 /**
  * User login
@@ -23,31 +11,25 @@ export const comparePasswords = (storedPass: string, customPass: string): boolea
  * @param {string} customPass
  * @returns {boolean}
  */
-export const utilLogIn = async (customEmail: string, customPass: string) => {
+export const utilLogIn = async (customEmail: string, customPass: string): Promise<StatusCodes> => {
     const appServer = getRunningExpressApp()
 
     try {
-        if (typeof customEmail === 'undefined' || !customEmail) {
-            //throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: loginController.LogIn - User email not provided!`)
+        // const user = await appServer.AppDataSource.getRepository(User).findOne({
+        //     where: {
+        //         userEmail: customEmail,
+        //         encryptPass: customPass
+        //     }
+        // })
+        const user= null;
+
+        if (!user) {
+            return StatusCodes.PRECONDITION_FAILED;
         }
 
-        if (typeof customPass === 'undefined' || !customPass) {
-            //throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: loginController.LogIn - User password not provided!`)
-        }
-
-        const user = await appServer.AppDataSource.getRepository(User).find({
-            where: {
-                userEmail: customEmail
-            }
-        })
-
-        //if (!user)
-        //throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: loginController.LogIn - No user find!`)
-
-        //if (!comparePasswords(user.keys.arguments.encryptPass, customPass))
-        //throw new InternalFlowiseError(StatusCodes.PRECONDITION_FAILED, `Error: loginController.LogIn - Incorrect Password Entry!`)
+        return StatusCodes.OK;
     } catch (error) {
-        //throw new InternalFlowiseError(StatusCodes.INTERNAL_SERVER_ERROR, `Error: loginController - ${getErrorMessage(error)}`)
+        return StatusCodes.INTERNAL_SERVER_ERROR;
     }
 }
 
@@ -62,11 +44,4 @@ export const utilLogOut = async (req: Request, res: Response) => {
     } catch {
         return 0
     }
-}
-function scryptSync(customPass: string, salt: string, arg2: number): Buffer {
-    throw new Error('Function not implemented.')
-}
-
-function timingSafeEqual(arg0: Buffer, buffer: Buffer): boolean {
-    throw new Error('Function not implemented.')
 }

@@ -143,8 +143,7 @@ export class App {
             '/api/v1/ping',
             '/api/v1/version',
             '/api/v1/attachments',
-            '/api/v1/metrics',
-            '/api/v1/login'
+            '/api/v1/metrics'
         ]
         const URL_CASE_INSENSITIVE_REGEX: RegExp = /\/api\/v1\//i
         const URL_CASE_SENSITIVE_REGEX: RegExp = /\/api\/v1\//
@@ -249,7 +248,7 @@ export class App {
         // Serve UI static
         // ----------------------------------------
 
-        const packagePath = getNodeModulesPackagePath('flowise-ui')
+        const packagePath = getNodeModulesPackagePath('growtheffect-ui')
         const uiBuildPath = path.join(packagePath, 'build')
         const uiHtmlPath = path.join(packagePath, 'build', 'index.html')
 
@@ -296,7 +295,7 @@ export async function start(): Promise<void> {
     await serverApp.config(io)
 
     server.listen(port, host, () => {
-        logger.info(`⚡️ [server]: Flowise Server is listening at ${host ? 'http://' + host : ''}:${port}`)
+        logger.info(`⚡️ [server]: GrowthEffect Server is listening at ${host ? 'http://' + host : ''}:${port}`)
     })
 }
 

@@ -2,35 +2,43 @@ import { useState } from 'react'
 import logo from '@/assets/images/growtheffect-logo-big-Black-300x129.png'
 import logoDark from '@/assets/images/growtheffect-logo-big-White-300x129.png'
 import './login.css'
-// API
+import bcrypt from 'bcryptjs'
+// 
 import loginApi from '@/api/login'
+
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 12;
 
 const Login = () => {
     const [isDarkMode, setIsDarkMode] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPass] = useState('')
+    const [message, setMessage] = useState('');
 
     const toggleTheme = () => {
         setIsDarkMode((prevMode) => !prevMode)
+    }
+    const encryptPassword = async (password) => {
+        const saltRounds = 10
+        const hashedPassword = await bcrypt.hash(password, saltRounds)
+        return hashedPassword
     }
 
     const OnClickLogin = async (e) => {
         e.preventDefault()
         try {
+
+            const encryptedPassword = await encryptPassword(password)
             const obj = {
                 email: email,
-                password: password
+                password: encryptedPassword
             }
 
             const response = await loginApi.login(obj)
 
-            if (response.status === 200) {
-                console.log('Login successful:', response.data)
-            } else {
-                console.error('Login failed with status:', response.status)
-            }
+            setMessage(response.data.message)
         } catch (error) {
-            console.error('Login API error:', error)
+            setMessage('Login API error:', error)
         }
     }
 
@@ -61,11 +69,16 @@ const Login = () => {
                         name='password'
                         placeholder='Password'
                         required
+                        minLength={MIN_PASSWORD_LENGTH}
+                        maxLength={MAX_PASSWORD_LENGTH}
                         value={password}
                         onChange={(e) => setPass(e.target.value)}
                     />
                     <button type='submit'>Login</button>
                 </form>
+                <div className='message'>
+                    {message}    
+                </div>
                 <p>
                     Don't have an account? <a href='/signup'>Sign Up</a>
                 </p>
