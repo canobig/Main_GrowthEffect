@@ -4,9 +4,9 @@
     "license": "SEE LICENSE IN LICENSE.md",
     "homepage": "https://www.growtheffect.co",
     "workspaces": [
-    "packages/*"
-  ],
-  "packageManager": "pnpm@9.13.2",
+        "packages/*"
+    ],
+    "packageManager": "pnpm@9.13.2",
     "author": {
         "name": "CanOnurBuyuk"
     },
@@ -71,7 +71,9 @@
         "start": "vite",
         "build": "vite build",
         "clean": "rimraf build",
-        "nuke": "rimraf build node_modules .turbo"
+        "nuke": "rimraf build node_modules .turbo",
+        "prepare": "husky install",
+        "create-hook": "husky add .husky/pre-commit \"npm test\""
     },
     "babel": {
         "presets": [
