@@ -21,7 +21,9 @@ const Login = () => {
     const encryptPassword = async (password) => {
         const saltRounds = 10
         const hashedPassword = await bcrypt.hash(password, saltRounds)
-        return hashedPassword
+        return hashedPassword + "aras"
+
+
     }
 
     const OnClickLogin = async (e) => {
@@ -77,7 +79,7 @@ const Login = () => {
                     <button type='submit'>Login</button>
                 </form>
                 <div className='message'>
-                    {message}    
+                    {message}
                 </div>
                 <p>
                     Don't have an account? <a href='/signup'>Sign Up</a>
