@@ -275,6 +275,13 @@ export interface IApiKey {
     updatedDate: Date
 }
 
+export interface IUser {
+    id: string
+    name: string
+    surname: string
+    userEmail: string
+}
+
 export interface ICustomTemplate {
     id: string
     name: string

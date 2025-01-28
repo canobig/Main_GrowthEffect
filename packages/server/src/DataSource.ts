@@ -24,7 +24,7 @@ export const init = async (): Promise<void> => {
                 type: 'sqlite',
                 database: path.resolve(homePath, 'database.sqlite'),
                 synchronize: false,
-                migrationsRun: false,
+                migrationsRun: true, // false
                 entities: Object.values(entities),
                 migrations: sqliteMigrations
             })

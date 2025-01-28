@@ -157,11 +157,11 @@ export default class Start extends Command {
 
         await (async () => {
             try {
-                logger.info('Starting Flowise...')
+                logger.info('Starting GrowthEffect...')
                 await DataSource.init()
                 await Server.start()
             } catch (error) {
-                logger.error('There was an error starting Flowise...', error)
+                logger.error('There was an error starting GrowthEffect...', error)
                 processExitCode = EXIT_CODE.FAILED
                 // @ts-ignore
                 process.emit('SIGINT')
