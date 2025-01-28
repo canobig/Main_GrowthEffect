@@ -17,6 +17,6 @@
         "inlineSourceMap": false,
         "rootDir": "./src"
     },
-    "include": ["src/**/*.ts"],
+    "include": ["src/**/*.ts", "src/config/**/*.ts"],
     "exclude": ["node_modules", "dist"]
 }

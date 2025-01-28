@@ -1,10 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import logo from '@/assets/images/growtheffect-logo-big-Black-300x129.png'
 import logoDark from '@/assets/images/growtheffect-logo-big-White-300x129.png'
 import './login.css'
-import bcrypt from 'bcryptjs'
-// 
 import loginApi from '@/api/login'
+
 
 const MIN_PASSWORD_LENGTH = 8;
 const MAX_PASSWORD_LENGTH = 12;
@@ -14,31 +14,26 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPass] = useState('')
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
 
     const toggleTheme = () => {
         setIsDarkMode((prevMode) => !prevMode)
-    }
-    const encryptPassword = async (password) => {
-        const saltRounds = 10
-        const hashedPassword = await bcrypt.hash(password, saltRounds)
-        return hashedPassword
     }
 
     const OnClickLogin = async (e) => {
         e.preventDefault()
         try {
-
-            const encryptedPassword = await encryptPassword(password)
             const obj = {
                 email: email,
-                password: encryptedPassword
+                password: password
             }
 
             const response = await loginApi.login(obj)
-
+            navigate('/');
             setMessage(response.data.message)
+
         } catch (error) {
-            setMessage('Login API error:', error)
+            setMessage('Login API error:'+ error)
         }
     }
 
@@ -79,9 +74,9 @@ const Login = () => {
                 <div className='message'>
                     {message}    
                 </div>
-                <p>
+                {/* <p>
                     Don't have an account? <a href='/signup'>Sign Up</a>
-                </p>
+                </p> */}
             </div>
         </div>
     )

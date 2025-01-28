@@ -23,15 +23,15 @@ const CanvasRoutes = {
             element: <Canvas />
         },
         {
-            path: '/agentcanvas',
+            path: 'agentcanvas',
             element: <Canvas />
         },
         {
-            path: '/agentcanvas/:id',
+            path: 'agentcanvas/:id',
             element: <Canvas />
         },
         {
-            path: '/marketplace/:id',
+            path: 'marketplace/:id',
             element: <MarketplaceCanvas />
         }
     ]

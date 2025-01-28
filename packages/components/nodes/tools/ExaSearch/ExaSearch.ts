@@ -209,9 +209,9 @@ class ExaSearch_Tools implements INode {
             client: new Exa(exaSearchApiKey),
             searchArgs: {
                 numResults: numResults ? parseFloat(numResults) : undefined,
-                type: type || undefined,
+                type: type as 'keyword' | 'neural' | 'auto' | undefined,
                 useAutoprompt: useAutoprompt || undefined,
-                category: category || undefined,
+                category: category as 'company' | 'research paper' | 'news' | 'github' | 'tweet' | 'pdf' | 'personal site' | 'linkedin profile' | 'financial report' | undefined,
                 includeDomains: includeDomains ? includeDomains.split(',') : undefined,
                 excludeDomains: excludeDomains ? excludeDomains.split(',') : undefined,
                 startCrawlDate: startCrawlDate || undefined,
