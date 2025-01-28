@@ -12,9 +12,11 @@
         "skipLibCheck": true /* Skip type checking all .d.ts files. */,
         "sourceMap": true,
         "strictPropertyInitialization": false,
-        "declaration": true
+        "declaration": true,
+        "inlineSources": true,
+        "inlineSourceMap": false,
+        "rootDir": "./src"
     },
-    "include": ["src/**/*.ts"],
-    //"exclude": ["node_modules", "**/*.test.ts"]
+    "include": ["src/**/*.ts", "src/config/**/*.ts"],
     "exclude": ["node_modules", "dist"]
 }

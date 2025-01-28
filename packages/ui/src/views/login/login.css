@@ -151,3 +151,9 @@ form button:hover {
 .login-container a:hover {
     text-decoration: underline;
 }
+
+.message {
+    color: #f44336;
+    font-weight: bold;
+    margin-top: 10px;
+}

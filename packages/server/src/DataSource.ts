@@ -13,7 +13,8 @@ let appDataSource: DataSource
 
 export const init = async (): Promise<void> => {
     let homePath
-    let flowisePath = path.join(getUserHome(), '.flowise')
+    let flowisePath = 
+    path.join(getUserHome(), '.flowise')
     if (!fs.existsSync(flowisePath)) {
         fs.mkdirSync(flowisePath)
     }
@@ -24,7 +25,7 @@ export const init = async (): Promise<void> => {
                 type: 'sqlite',
                 database: path.resolve(homePath, 'database.sqlite'),
                 synchronize: false,
-                migrationsRun: false,
+                migrationsRun: true,
                 entities: Object.values(entities),
                 migrations: sqliteMigrations
             })

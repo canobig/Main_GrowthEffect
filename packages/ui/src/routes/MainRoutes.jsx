@@ -28,9 +28,6 @@ const Credentials = Loadable(lazy(() => import('@/views/credentials')))
 // variables routing
 const Variables = Loadable(lazy(() => import('@/views/variables')))
 
-// login routing
-const Login = Loadable(lazy(() => import('@/views/login')))
-
 // documents routing
 const Documents = Loadable(lazy(() => import('@/views/docstore')))
 const DocumentStoreDetail = Loadable(lazy(() => import('@/views/docstore/DocumentStoreDetail')))
@@ -61,10 +58,10 @@ const MainRoutes = {
             path: '/marketplaces',
             element: <Marketplaces />
         },
-        {
-            path: '/apikey',
-            element: <APIKey />
-        },
+        // {
+        //     path: '/apikey',
+        //     element: <APIKey />
+        // },
         {
             path: '/tools',
             element: <Tools />
@@ -73,10 +70,10 @@ const MainRoutes = {
             path: '/assistants',
             element: <Assistants />
         },
-        {
-            path: '/credentials',
-            element: <Credentials />
-        },
+        // {
+        //     path: '/credentials',
+        //     element: <Credentials />
+        // },
         {
             path: '/variables',
             element: <Variables />
@@ -84,10 +81,6 @@ const MainRoutes = {
         {
             path: '/document-stores',
             element: <Documents />
-        },
-        {
-            path: '/login',
-            element: <Login />
         },
         {
             path: '/document-stores/:id',

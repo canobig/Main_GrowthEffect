@@ -1,8 +1,8 @@
 {
-    "name": "flowise",
-    "version": "2.1.4",
+    "name": "growtheffect",
+    "version": "1.0.0",
     "private": true,
-    "homepage": "https://flowiseai.com",
+    "homepage": "https://www.growtheffect.co",
     "workspaces": [
         "packages/*",
         "flowise",
@@ -29,10 +29,17 @@
     "lint-staged": {
         "*.{js,jsx,ts,tsx,json,md}": "eslint --fix"
     },
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "jsonwebtoken": "^8.5.1",
+        "react-cookie": "^7.2.2"
+    },
     "devDependencies": {
         "@babel/preset-env": "^7.19.4",
         "@babel/preset-typescript": "7.18.6",
+        "@types/bcryptjs": "^2.4.6",
         "@types/express": "^4.17.13",
+        "@types/jsonwebtoken": "^9.0.7",
         "@typescript-eslint/typescript-estree": "^7.13.1",
         "eslint": "^8.24.0",
         "eslint-config-prettier": "^8.3.0",
