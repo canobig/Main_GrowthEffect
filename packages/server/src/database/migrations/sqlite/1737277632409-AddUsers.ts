@@ -11,13 +11,13 @@ export class AddUsers1737277632409 implements MigrationInterface {
     
     "encryptPass" varchar NOT NULL,
     
-    "counter" INTEGER NOT NULL,
+    "isActive" BOOLEAN NOT NULL,
     
     "loginTimestamp" datetime NOT NULL DEFAULT (datetime('now')),
     
     "passUpdatedDate" datetime NOT NULL DEFAULT (datetime('now')));`)
     }
-
+  
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`DROP TABLE IF EXISTS "user";`)
     }

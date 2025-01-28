@@ -36,7 +36,7 @@ const dashboard = {
             url: '/agentflows',
             icon: icons.IconUsersGroup,
             breadcrumbs: true,
-            isBeta: true
+            isBeta: false
         },
         {
             id: 'marketplaces',
@@ -62,14 +62,14 @@ const dashboard = {
             icon: icons.IconRobot,
             breadcrumbs: true
         },
-        {
-            id: 'credentials',
-            title: 'Credentials',
-            type: 'item',
-            url: '/credentials',
-            icon: icons.IconLock,
-            breadcrumbs: true
-        },
+        // {
+        //     id: 'credentials',
+        //     title: 'Credentials',
+        //     type: 'item',
+        //     url: '/credentials',
+        //     icon: icons.IconLock,
+        //     breadcrumbs: true
+        // },
         {
             id: 'variables',
             title: 'Variables',
@@ -78,14 +78,14 @@ const dashboard = {
             icon: icons.IconVariable,
             breadcrumbs: true
         },
-        {
-            id: 'apikey',
-            title: 'API Keys',
-            type: 'item',
-            url: '/apikey',
-            icon: icons.IconKey,
-            breadcrumbs: true
-        },
+        // {
+        //     id: 'apikey',
+        //     title: 'API Keys',
+        //     type: 'item',
+        //     url: '/apikey',
+        //     icon: icons.IconKey,
+        //     breadcrumbs: true
+        // },
         {
             id: 'document-stores',
             title: 'Document Stores',

@@ -1,9 +1,7 @@
 import { Request, Response } from 'express'
-import { User } from '../database/entities/User'
 import { getRunningExpressApp } from './getRunningExpressApp'
-import { InternalFlowiseError } from '../errors/internalFlowiseError'
 import { StatusCodes } from 'http-status-codes';
-import { getErrorMessage } from '../errors/utils'
+import { checkIfUserExist } from './userOperation';
 
 /**
  * User login
@@ -15,19 +13,14 @@ export const utilLogIn = async (customEmail: string, customPass: string): Promis
     const appServer = getRunningExpressApp()
 
     try {
-        // const user = await appServer.AppDataSource.getRepository(User).findOne({
-        //     where: {
-        //         userEmail: customEmail,
-        //         encryptPass: customPass
-        //     }
-        // })
-        const user= null;
+        
+        const response = await checkIfUserExist(customEmail, customPass);
 
-        if (!user) {
+        if (!response) {
             return StatusCodes.PRECONDITION_FAILED;
         }
 
-        return StatusCodes.OK;
+        return response;
     } catch (error) {
         return StatusCodes.INTERNAL_SERVER_ERROR;
     }
