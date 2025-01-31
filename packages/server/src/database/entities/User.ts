@@ -16,7 +16,7 @@ export class User implements IUser {
     @Column()
     loginTimestamp: Date
     @Column()
-    counter: number
+    isActive: boolean
     @Column()
     passUpdatedDate: Date
 }
