@@ -23,9 +23,8 @@
         "lint": "eslint \"**/*.{js,jsx,ts,tsx,json,md}\"",
         "lint-fix": "pnpm lint --fix",
         "quick": "pretty-quick --staged",
-        "postinstall": "husky install",
+        "postinstall": "[ -d .git ] || git init && husky install",
         "migration:create": "pnpm typeorm migration:create",
-        "prepare": "husky install",
         "test": "echo \"No test specified\" && exit 0"
     },
     "lint-staged": {
