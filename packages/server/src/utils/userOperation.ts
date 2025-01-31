@@ -25,7 +25,7 @@ export const checkIfUserExist = async (email: string, password: string): Promise
     } catch (error) {
         throw new InternalFlowiseError(
             StatusCodes.INTERNAL_SERVER_ERROR,
-            `Error: loginService.checkIfChatflowIsValidForStreaming - ${getErrorMessage(error)}`
+            `Error: loginService.checkIfUserExist - ${getErrorMessage(error)}`
         )
     }
 }
