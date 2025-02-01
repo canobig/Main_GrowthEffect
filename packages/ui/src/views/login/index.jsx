@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
 import logo from '@/assets/images/growtheffect-logo-big-Black-300x129.png'
 import logoDark from '@/assets/images/growtheffect-logo-big-White-300x129.png'
 import './login.css'
@@ -14,7 +13,6 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPass] = useState('')
     const [message, setMessage] = useState('');
-    const navigate = useNavigate();
 
     const toggleTheme = () => {
         setIsDarkMode((prevMode) => !prevMode)
@@ -29,7 +27,8 @@ const Login = () => {
             }
 
             const response = await loginApi.login(obj)
-            navigate('/');
+            const url = window.location.origin +'/';
+            window.location.href = "/";
             setMessage(response.data.message)
 
         } catch (error) {
