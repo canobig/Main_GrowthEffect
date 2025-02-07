@@ -1,15 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { utilLogIn } from '../../utils/login'
-//import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
 import { Response } from 'express';
-
-const failedAttempts: { [key: string]: number } = {}
-
-// const encryptPassword = async (userPass: string) => {
-//   const hashedPassword = await bcrypt.hash(userPass, 10)
-//   return hashedPassword
-// }
 
 function generateToken() {
     const secretKey = "sanatcilarsitesi";
@@ -25,41 +17,34 @@ const login = async (userEmail: string, userPass: string, res: Response): Promis
         if (!userEmail || !userPass) {
             return {
                 status: StatusCodes.PRECONDITION_FAILED,
-                message: 'User email or password not provided!'
-            }
-        }
-        
-        if (failedAttempts[userEmail] >= 3) {
-            //veritabanı güncelleme işi yazılacak
-            return {
-                status: StatusCodes.FORBIDDEN,
-                message: 'Hesap, çok fazla başarısız giriş denemesi nedeniyle kilitlendi. Lütfen daha sonra tekrar deneyin.'
+                message: 'Kullanıcı ya da şifre girişi yapılmalıdır.!'
             }
         }
 
-        const dbResponse = await utilLogIn(userEmail, userPass)
+        const userResponse = await utilLogIn(userEmail, userPass)
 
-        if (dbResponse === StatusCodes.INTERNAL_SERVER_ERROR) {
+        if (userResponse === StatusCodes.INTERNAL_SERVER_ERROR) {
             return {
                 status: StatusCodes.INTERNAL_SERVER_ERROR,
                 message: 'Login işlemi sırasında bir hata oluştu. Lütfen yönetici ile iletişime geçiniz.'
             }
-        }
-
-        if (dbResponse === StatusCodes.PRECONDITION_FAILED) {
-            failedAttempts[userEmail] = (failedAttempts[userEmail] || 0) + 1
+        } else if (userResponse === StatusCodes.PRECONDITION_FAILED) {
             return {
-                status: StatusCodes.PRECONDITION_FAILED,
-                message: 'Kullanıcı ya da şifre hatalı girildi. Lütfen kontrol ediniz.'
-            }
-        }
+                    status: StatusCodes.PRECONDITION_FAILED,
+                    message: 'Kullanıcı ya da şifre hatalı girildi. Lütfen kontrol ediniz.'
+                }
+        } else if (userResponse === StatusCodes.FORBIDDEN) {
+            return {
+                     status: StatusCodes.PRECONDITION_FAILED,
+                     message: 'Hesap, çok fazla başarısız giriş denemesi nedeniyle kilitlendi. Lütfen daha sonra tekrar deneyin.'
+                }
+        } 
 
-        failedAttempts[userEmail] = 0
         const token = jwt.sign({ email: userEmail }, generateToken(), { expiresIn: '1h' })
         res.cookie('authToken', token, { 
-            httpOnly: false, 
-            secure: true, 
-            sameSite: 'none', 
+            httpOnly: true, 
+            secure: false, 
+            sameSite: 'lax', 
             maxAge: 24 * 60 * 60 * 1000 });
 
         return {

@@ -3,6 +3,7 @@ import logo from '@/assets/images/growtheffect-logo-big-Black-300x129.png'
 import logoDark from '@/assets/images/growtheffect-logo-big-White-300x129.png'
 import './login.css'
 import loginApi from '@/api/login'
+import { StatusCodes } from 'http-status-codes'
 
 
 const MIN_PASSWORD_LENGTH = 8;
@@ -27,8 +28,8 @@ const Login = () => {
             }
 
             const response = await loginApi.login(obj)
-            const url = window.location.origin +'/';
-            window.location.href = "/";
+            if (response.data.status == StatusCodes.OK)
+                window.location.href = "/";
             setMessage(response.data.message)
 
         } catch (error) {

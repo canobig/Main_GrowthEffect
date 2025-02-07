@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryColumn, UpdateDateColumn, PrimaryGeneratedColumn } from 'typeorm'
-import { IApiKey, IUser } from '../../Interface'
+import { IUser } from '../../Interface'
 
 @Entity('user')
 export class User implements IUser {
