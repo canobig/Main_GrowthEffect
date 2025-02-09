@@ -42,8 +42,8 @@ const login = async (userEmail: string, userPass: string, res: Response): Promis
 
         const token = jwt.sign({ email: userEmail }, generateToken(), { expiresIn: '1h' })
         res.cookie('authToken', token, { 
-            httpOnly: true, 
-            secure: false, 
+            httpOnly: false, 
+            secure: true, 
             sameSite: 'lax', 
             maxAge: 24 * 60 * 60 * 1000 });
 
