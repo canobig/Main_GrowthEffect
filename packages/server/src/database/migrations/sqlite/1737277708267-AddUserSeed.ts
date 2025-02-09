@@ -5,7 +5,7 @@ export class AddUserSeed1737277708267 implements MigrationInterface {
         
         VALUES
         
-        ('1', 'Can Onur', 'Buyuk', 'canobuyuk96@gmail.com', '$2a$10$.q80u4qJEvsX055w8s8wXuzbH849hUezcsKTeIaRst/EG98OziZR6', 1, datetime('now'), datetime('now'));`)
+        ('1', 'Can Onur', 'Buyuk', 'can@growtheffect.co', '$2a$10$.q80u4qJEvsX055w8s8wXuzbH849hUezcsKTeIaRst/EG98OziZR6', 1, datetime('now'), datetime('now'));`)
     }
     public async down(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`DELETE FROM "user" WHERE "id" IN ('1');`)

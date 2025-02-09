@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { getRunningExpressApp } from './getRunningExpressApp'
 import { StatusCodes } from 'http-status-codes';
 import { checkIfUserExist } from './userOperation';
 
@@ -10,8 +9,6 @@ import { checkIfUserExist } from './userOperation';
  * @returns {boolean}
  */
 export const utilLogIn = async (customEmail: string, customPass: string): Promise<StatusCodes> => {
-    const appServer = getRunningExpressApp()
-
     try {
         
         const response = await checkIfUserExist(customEmail, customPass);
