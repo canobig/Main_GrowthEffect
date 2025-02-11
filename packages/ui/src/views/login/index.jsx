@@ -37,6 +37,10 @@ const Login = () => {
         }
     }
 
+    const handleForgotPassword = () => {
+        window.open ('https://www.growtheffect.co/forgot_password','_blank');
+    };
+
     return (
         <div className={`background ${isDarkMode ? 'night-mode' : 'day-mode'}`}>
             <div className='mode-toggle'>
@@ -71,12 +75,12 @@ const Login = () => {
                     />
                     <button type='submit'>Login</button>
                 </form>
+                <button className="forgot-password-btn" onClick={handleForgotPassword}>
+                    Forgot Password
+                </button>
                 <div className='message'>
                     {message}
                 </div>
-                {/* <p>
-                    Don't have an account? <a href='/signup'>Sign Up</a>
-                </p> */}
             </div>
         </div>
     )
