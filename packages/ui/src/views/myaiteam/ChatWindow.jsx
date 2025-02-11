@@ -5,6 +5,37 @@ import { myAITeamApi } from '../../api/myaiteam';
 import { wsService } from '../../api/websocket';
 import FileMessage from './FileMessage';
 
+const formatDateTime = (timestamp) => {
+    const date = new Date(timestamp);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    // Format time as HH:mm
+    const time = date.toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false 
+    });
+
+    // If message is from today, just show time
+    if (date.toDateString() === today.toDateString()) {
+        return time;
+    }
+    
+    // If message is from yesterday, show "Yesterday, HH:mm"
+    if (date.toDateString() === yesterday.toDateString()) {
+        return `Yesterday, ${time}`;
+    }
+
+    // For other dates, show DD.MM.YY, HH:mm
+    return `${date.toLocaleDateString([], {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit'
+    })}, ${time}`;
+};
+
 const Message = ({ message, isUser }) => (
     <Box
         sx={{
@@ -23,7 +54,31 @@ const Message = ({ message, isUser }) => (
                 wordBreak: 'break-word'
             }}
         >
+            <Typography 
+                variant="caption" 
+                sx={{ 
+                    display: 'block', 
+                    mb: 0.5,
+                    opacity: 0.8 
+                }}
+            >
+                {isUser ? 'You' : 'Agent'}
+            </Typography>
             <Typography variant="body1">{message.content}</Typography>
+            {message.timestamp && (
+                <Typography 
+                    variant="caption" 
+                    sx={{ 
+                        display: 'block', 
+                        mt: 0.5,
+                        opacity: 0.8,
+                        textAlign: isUser ? 'right' : 'left',
+                        fontSize: '0.75rem'
+                    }}
+                >
+                    {formatDateTime(message.timestamp)}
+                </Typography>
+            )}
         </Paper>
     </Box>
 );
@@ -157,7 +212,8 @@ const ChatWindow = ({ selectedAgent }) => {
         const userMessage = {
             content: inputMessage,
             isUser: true,
-            timestamp: new Date()
+            timestamp: new Date(),
+            type: 'userMessage'
         };
 
         setMessages(prev => [...prev, userMessage]);
@@ -176,15 +232,15 @@ const ChatWindow = ({ selectedAgent }) => {
                 setCurrentChatId(response.chatId);
             }
             
-            if (response.reply) {
-                const agentResponse = {
-                    content: response.reply,
-                    isUser: false,
-                    timestamp: new Date(),
-                    chatId: response.chatId
-                };
-                setMessages(prev => [...prev, agentResponse]);
-            }
+            const agentResponse = {
+                content: response.reply || response.text,
+                isUser: false,
+                timestamp: new Date(),
+                chatId: response.chatId,
+                type: 'agentMessage'
+            };
+
+            setMessages(prev => [...prev, agentResponse]);
         } catch (error) {
             setError('Failed to send message. Please try again.');
             console.error('Error sending message:', error);

@@ -23,6 +23,14 @@ const dashboard = {
     type: 'group',
     children: [
         {
+            id: 'my-ai-team',
+            title: 'My AI Team',
+            type: 'item',
+            url: '/myaiteam',
+            icon: icons.IconUsers,
+            breadcrumbs: false
+        },
+        {
             id: 'chatflows',
             title: 'Chatflows',
             type: 'item',
@@ -94,14 +102,6 @@ const dashboard = {
             url: '/document-stores',
             icon: icons.IconFiles,
             breadcrumbs: true
-        },
-        {
-            id: 'my-ai-team',
-            title: 'My AI Team',
-            type: 'item',
-            url: '/myaiteam',
-            icon: icons.IconUsers,
-            breadcrumbs: false
         }
     ]
 }

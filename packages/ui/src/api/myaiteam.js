@@ -64,14 +64,21 @@ export const myAITeamApi = {
         return { messages: [] };
       }
 
-      // Transform the messages to our format, properly identifying user/agent messages
-      const messages = response.data.map(msg => ({
-        content: msg.question || msg.answer || msg.content,
-        // If msg has a question property, it's a user message
-        isUser: !!msg.question,
-        timestamp: new Date(msg.createdDate),
-        chatId: msg.chatId
-      }));
+      // Transform the messages to our format
+      const messages = response.data.map(msg => {
+        // Determine if it's a user message
+        const isUser = msg.from === 'human' || 
+                     msg.role === 'user' || 
+                     msg.type === 'userMessage' ||
+                     !!msg.question;
+
+        return {
+          content: isUser ? msg.question : (msg.answer || msg.content),
+          isUser: isUser,
+          timestamp: new Date(msg.createdDate),
+          chatId: msg.chatId
+        };
+      });
 
       // Sort messages by timestamp (oldest first)
       messages.sort((a, b) => a.timestamp - b.timestamp);
