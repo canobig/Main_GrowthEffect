@@ -4,30 +4,30 @@ import { resolve } from 'path'
 import dotenv from 'dotenv'
 
 export default defineConfig(async ({ mode }) => {
-    let proxy = undefined
-    if (mode === 'development') {
-        const serverEnv = dotenv.config({ processEnv: {}, path: '../server/.env' }).parsed
-        const serverHost = serverEnv?.['HOST'] ?? 'localhost'
-        const serverPort = parseInt(serverEnv?.['PORT'] ?? 3000)
-        if (!Number.isNaN(serverPort) && serverPort > 0 && serverPort < 65535) {
-            proxy = {
-                '^/api(/|$).*': {
-                    target: `http://${serverHost}:${serverPort}`,
-                    changeOrigin: true
-                },
-                '/socket.io': {
-                    target: `http://${serverHost}:${serverPort}`,
-                    changeOrigin: true
-                }
-            }
-        }
-    }
     dotenv.config()
+    
+    const serverPort = process.env.PORT || 3000
+    
     return {
         plugins: [react()],
         resolve: {
             alias: {
-                '@': resolve(__dirname, 'src')
+                '@': resolve(__dirname, './src'),
+                'views': resolve(__dirname, './src/views'),
+                'ui-component': resolve(__dirname, './src/ui-component')
+            },
+            extensions: ['.js', '.jsx', '.json']
+        },
+        esbuild: {
+            loader: 'jsx',
+            include: /src\/.*\.jsx?$/,
+            exclude: []
+        },
+        optimizeDeps: {
+            esbuildOptions: {
+                loader: {
+                    '.js': 'jsx'
+                }
             }
         },
         root: resolve(__dirname),
@@ -35,10 +35,18 @@ export default defineConfig(async ({ mode }) => {
             outDir: './build'
         },
         server: {
-            open: true,
-            proxy,
-            port: process.env.VITE_PORT ?? 8080,
-            host: process.env.VITE_HOST
+            port: 5173, // UI dev server port
+            proxy: {
+                '/api': {
+                    target: `http://localhost:${serverPort}`,
+                    changeOrigin: true
+                },
+                '/socket.io': {
+                    target: `http://localhost:${serverPort}`,
+                    changeOrigin: true,
+                    ws: true
+                }
+            }
         }
     }
 })

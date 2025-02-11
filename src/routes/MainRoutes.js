@@ -1,0 +1,4 @@
+{
+    path: '/myaiteam',
+    element: <MyAITeam />
+} 

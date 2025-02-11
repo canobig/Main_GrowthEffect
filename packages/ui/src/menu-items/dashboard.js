@@ -8,11 +8,12 @@ import {
     IconLock,
     IconRobot,
     IconVariable,
-    IconFiles
+    IconFiles,
+    IconUsers
 } from '@tabler/icons-react'
 
 // constant
-const icons = { IconUsersGroup, IconHierarchy, IconBuildingStore, IconKey, IconTool, IconLock, IconRobot, IconVariable, IconFiles }
+const icons = { IconUsersGroup, IconHierarchy, IconBuildingStore, IconKey, IconTool, IconLock, IconRobot, IconVariable, IconFiles, IconUsers }
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -31,12 +32,11 @@ const dashboard = {
         },
         {
             id: 'agentflows',
-            title: 'Agentflows',
+            title: 'Agent Flows',
             type: 'item',
             url: '/agentflows',
             icon: icons.IconUsersGroup,
-            breadcrumbs: true,
-            isBeta: false
+            breadcrumbs: true
         },
         {
             id: 'marketplaces',
@@ -62,14 +62,6 @@ const dashboard = {
             icon: icons.IconRobot,
             breadcrumbs: true
         },
-        // {
-        //     id: 'credentials',
-        //     title: 'Credentials',
-        //     type: 'item',
-        //     url: '/credentials',
-        //     icon: icons.IconLock,
-        //     breadcrumbs: true
-        // },
         {
             id: 'variables',
             title: 'Variables',
@@ -78,21 +70,13 @@ const dashboard = {
             icon: icons.IconVariable,
             breadcrumbs: true
         },
-        // {
-        //     id: 'apikey',
-        //     title: 'API Keys',
-        //     type: 'item',
-        //     url: '/apikey',
-        //     icon: icons.IconKey,
-        //     breadcrumbs: true
-        // },
         {
-            id: 'document-stores',
-            title: 'Document Stores',
+            id: 'myaiteam',
+            title: 'My AI Team',
             type: 'item',
-            url: '/document-stores',
-            icon: icons.IconFiles,
-            breadcrumbs: true
+            url: '/myaiteam',
+            icon: icons.IconUsers,
+            breadcrumbs: false
         }
     ]
 }

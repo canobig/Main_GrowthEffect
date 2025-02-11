@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 // material-ui
-import { Box, Skeleton, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Box, Skeleton, Stack, ToggleButton, ToggleButtonGroup, Typography, Button, OutlinedInput, InputAdornment } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 
 // project imports
@@ -27,7 +27,7 @@ import useApi from '@/hooks/useApi'
 import { baseURL } from '@/store/constant'
 
 // icons
-import { IconPlus, IconLayoutGrid, IconList } from '@tabler/icons-react'
+import { IconPlus, IconLayoutGrid, IconList, IconSearch } from '@tabler/icons-react'
 
 // ==============================|| CHATFLOWS ||============================== //
 
@@ -125,7 +125,38 @@ const Chatflows = () => {
     }, [getAllChatflowsApi.data])
 
     return (
-        <MainCard>
+        <Box sx={{ 
+            height: '100%',
+            bgcolor: 'background.paper',
+            p: 2
+        }}>
+            <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                mb: 3
+            }}>
+                <Typography variant="h4">Chatflows</Typography>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <OutlinedInput
+                        size="small"
+                        placeholder="Search Name or Category [ ⌘ + F ]"
+                        startAdornment={
+                            <InputAdornment position="start">
+                                <IconSearch stroke={1.5} size="1rem" />
+                            </InputAdornment>
+                        }
+                    />
+                    <Button
+                        variant="contained"
+                        startIcon={<IconPlus />}
+                        onClick={addNew}
+                    >
+                        Add New
+                    </Button>
+                </Box>
+            </Box>
+
             {error ? (
                 <ErrorBoundary error={error} />
             ) : (
@@ -163,9 +194,6 @@ const Chatflows = () => {
                                 <IconList />
                             </ToggleButton>
                         </ToggleButtonGroup>
-                        <StyledButton variant='contained' onClick={addNew} startIcon={<IconPlus />} sx={{ borderRadius: 2, height: 40 }}>
-                            Add New
-                        </StyledButton>
                     </ViewHeader>
                     {!view || view === 'card' ? (
                         <>
@@ -194,23 +222,37 @@ const Chatflows = () => {
                         />
                     )}
                     {!isLoading && (!getAllChatflowsApi.data || getAllChatflowsApi.data.length === 0) && (
-                        <Stack sx={{ alignItems: 'center', justifyContent: 'center' }} flexDirection='column'>
-                            <Box sx={{ p: 2, height: 'auto' }}>
-                                <img
-                                    style={{ objectFit: 'cover', height: '25vh', width: 'auto' }}
-                                    src={WorkflowEmptySVG}
-                                    alt='WorkflowEmptySVG'
-                                />
-                            </Box>
-                            <div>No Chatflows Yet</div>
-                        </Stack>
+                        <Box 
+                            sx={{ 
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: 'calc(100% - 100px)',
+                                color: 'text.secondary'
+                            }}
+                        >
+                            <img 
+                                src={WorkflowEmptySVG}
+                                alt="No Chatflows" 
+                                style={{ 
+                                    width: '200px',
+                                    marginBottom: '16px',
+                                    opacity: 0.7
+                                }} 
+                            />
+                            <Typography variant="h6">No Chatflows Yet</Typography>
+                            <Typography variant="body2" sx={{ mt: 1 }}>
+                                Create your first chatflow by clicking the Add New button
+                            </Typography>
+                        </Box>
                     )}
                 </Stack>
             )}
 
             <LoginDialog show={loginDialogOpen} dialogProps={loginDialogProps} onConfirm={onLoginClick} />
             <ConfirmDialog />
-        </MainCard>
+        </Box>
     )
 }
 
