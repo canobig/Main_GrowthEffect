@@ -27,26 +27,82 @@ const MyAITeam = () => {
     };
 
     return (
-        <MainCard>
-            <Grid container spacing={2} sx={{ height: 'calc(100vh - 180px)' }}>
-                {/* Agent List Panel */}
-                <Grid item xs={12} md={3} sx={{ borderRight: '1px solid', borderColor: 'divider' }}>
-                    <Typography variant="h4" mb={2}>
+        <MainCard 
+            sx={{ 
+                height: '100vh',
+                position: 'fixed',
+                zIndex: 1,
+                mt: 0,
+                display: 'flex',
+                flexDirection: 'column'
+            }}
+        >
+            <Grid 
+                container 
+                spacing={0}
+                sx={{ 
+                    height: '100%',   
+                    overflow: 'hidden' // Grid içinde taşma olmasın
+                }}
+            >
+                {/* SOL PANEL: Agent List */}
+                <Grid 
+                    item 
+                    xs={12} 
+                    md={3} 
+                    sx={{ 
+                        borderRight: '1px solid', 
+                        borderColor: 'divider',
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflowY: 'auto', // Sadece sol panelde scroll
+                        pt: 2
+                    }}
+                >
+                    <Typography variant="h4" sx={{ mb: 2, px: 1 }}>
                         My Agents
                     </Typography>
-                    <AgentList 
-                        onSelectAgent={handleSelectAgent}
-                        selectedAgent={selectedAgent}
-                    />
+                    <Box 
+                        sx={{ 
+                            flexGrow: 1,
+                            overflowY: 'auto', 
+                            px: 1
+                        }}
+                    >
+                        <AgentList 
+                            onSelectAgent={handleSelectAgent}
+                            selectedAgent={selectedAgent}
+                        />
+                    </Box>
                 </Grid>
                 
-                {/* Chat Panel */}
-                <Grid item xs={12} md={9}>
-                    <ChatWindow selectedAgent={selectedAgent} />
+                {/* SAĞ PANEL: Chat Window (Scroll'u KAPATTIK) */}
+                <Grid 
+                    item 
+                    xs={12} 
+                    md={9} 
+                    sx={{ 
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden', // Sayfanın scroll olmasını engelle
+                    }}
+                >
+                    <Box 
+                        sx={{ 
+                            flexGrow: 1, 
+                            overflow: 'hidden', // ChatWindow'un scroll olmaması için
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
+                    >
+                        <ChatWindow selectedAgent={selectedAgent} />
+                    </Box>
                 </Grid>
             </Grid>
         </MainCard>
     );
 };
 
-export default MyAITeam; 
+export default MyAITeam;

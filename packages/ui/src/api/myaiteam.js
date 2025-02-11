@@ -1,13 +1,27 @@
 import client from './client';
 
 export const myAITeamApi = {
-  // Get the list of agents (using multiagent chatflows)
+  // Get the list of agents and chatflows
   getAgents: async () => {
     try {
-      const response = await client.get('/chatflows?type=MULTIAGENT');
-      return response.data;
+      // Get multiagent chatflows (agents)
+      const agentsResponse = await client.get('/chatflows?type=MULTIAGENT');
+      const agents = agentsResponse.data.map(agent => ({
+        ...agent,
+        isAgent: true // Add flag to identify as agent
+      }));
+
+      // Get regular chatflows
+      const chatflowsResponse = await client.get('/chatflows?type=CHATFLOW');
+      const chatflows = chatflowsResponse.data.map(chatflow => ({
+        ...chatflow,
+        isAgent: false // Add flag to identify as chatflow
+      }));
+
+      // Combine and return both
+      return [...agents, ...chatflows];
     } catch (error) {
-      console.error('Error fetching agents:', error);
+      console.error('Error fetching agents and chatflows:', error);
       throw error;
     }
   },
@@ -100,5 +114,15 @@ export const myAITeamApi = {
       console.error('Error aborting message:', error);
       throw error;
     }
-  }
+  },
+
+  // Clear chat history for an agent
+  clearChatHistory: async (agentId) => {
+    try {
+      await client.delete(`/chatmessage/${agentId}`);
+    } catch (error) {
+      console.error('Error clearing chat history:', error);
+      throw error;
+    }
+  },
 };

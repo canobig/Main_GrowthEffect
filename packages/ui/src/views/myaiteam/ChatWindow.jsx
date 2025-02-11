@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Box, TextField, IconButton, Paper, Typography, CircularProgress, Alert } from '@mui/material';
-import { Send as SendIcon, AttachFile, Stop as StopIcon } from '@mui/icons-material';
+import { Send as SendIcon, AttachFile, Stop as StopIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { myAITeamApi } from '../../api/myaiteam';
 import { wsService } from '../../api/websocket';
 import FileMessage from './FileMessage';
@@ -243,6 +243,22 @@ const ChatWindow = ({ selectedAgent }) => {
         }
     };
 
+    const handleClearHistory = async () => {
+        if (!selectedAgent) return;
+        
+        try {
+            setIsLoading(true);
+            await myAITeamApi.clearChatHistory(selectedAgent.id);
+            setMessages([]);
+            setCurrentChatId(null);
+        } catch (error) {
+            setError('Failed to clear chat history. Please try again.');
+            console.error('Error clearing chat history:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const renderMessage = (message) => {
         if (message.type === 'file') {
             return <FileMessage key={message.timestamp} file={message.content} isUser={message.isUser} />;
@@ -253,10 +269,10 @@ const ChatWindow = ({ selectedAgent }) => {
     return (
         <Box 
             sx={{ 
-                height: 'calc(100vh - 240px)', // Adjust height to account for header and padding
+                height: 'calc(100vh - 100px)', // Increased height by reducing the subtraction
                 display: 'flex', 
                 flexDirection: 'column',
-                position: 'relative' // Add this for proper positioning
+                position: 'relative'
             }}
         >
             {error && (
@@ -271,11 +287,13 @@ const ChatWindow = ({ selectedAgent }) => {
                 sx={{
                     flexGrow: 1,
                     overflowY: 'auto',
-                    p: 1,
+                    p: 2,
                     backgroundColor: 'background.default',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 1,
+                    gap: 2,
+                    position: 'relative',
+                    maxHeight: 'calc(100vh - 160px)', // Adjusted to match new container height
                     '&::-webkit-scrollbar': {
                         width: '8px',
                     },
@@ -288,6 +306,37 @@ const ChatWindow = ({ selectedAgent }) => {
                     }
                 }}
             >
+                {selectedAgent && (
+                    <Box
+                        sx={{
+                            position: 'sticky',
+                            top: 0,
+                            zIndex: 2,
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            pb: 1
+                        }}
+                    >
+                        <IconButton
+                            size="small"
+                            onClick={handleClearHistory}
+                            disabled={isLoading || messages.length === 0}
+                            sx={{
+                                backgroundColor: 'background.paper',
+                                '&:hover': {
+                                    backgroundColor: '#ffebee'
+                                },
+                                opacity: 0.8,
+                                '&:hover': {
+                                    opacity: 1
+                                }
+                            }}
+                        >
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Box>
+                )}
+                
                 {isLoading && hasMore && (
                     <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, position: 'sticky', top: 0, zIndex: 1 }}>
                         <CircularProgress size={24} />
@@ -316,21 +365,21 @@ const ChatWindow = ({ selectedAgent }) => {
                 <div ref={messagesEndRef} />
             </Box>
 
-            {/* Input Area - Make it stick to bottom with minimal spacing */}
+            {/* Input Area - Keep it compact at the bottom */}
             <Box 
                 sx={{ 
                     p: 0.5,
                     backgroundColor: 'background.paper',
                     borderTop: 1,
                     borderColor: 'divider',
-                    mt: 'auto'
+                    minHeight: '60px', // Ensure consistent height for input area
                 }}
             >
                 <Box sx={{ 
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: 1,
-                    '& .MuiInputBase-root': {
+                    '& .MuiInputBase-root': { // Reduce TextField padding
                         py: 0.5
                     }
                 }}>
@@ -342,7 +391,7 @@ const ChatWindow = ({ selectedAgent }) => {
                         accept="image/*,.pdf,.doc,.docx,.txt"
                     />
                     <IconButton
-                        size="small"
+                        size="small" // Make buttons slightly smaller
                         color="primary"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={!selectedAgent || isLoading}
@@ -361,7 +410,7 @@ const ChatWindow = ({ selectedAgent }) => {
                         sx={{ 
                             backgroundColor: 'background.paper',
                             '& .MuiOutlinedInput-root': {
-                                padding: '8px 14px'
+                                padding: '8px 14px' // Reduce internal padding
                             }
                         }}
                     />
@@ -381,7 +430,7 @@ const ChatWindow = ({ selectedAgent }) => {
                                 >
                                     <StopIcon />
                                 </IconButton>
-                                <CircularProgress size={20} />
+                                <CircularProgress size={20} /> {/* Slightly smaller loading indicator */}
                             </>
                         )}
                         {!isLoading && (
