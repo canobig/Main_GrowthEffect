@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Box, TextField, IconButton, Paper, Typography, CircularProgress, Alert } from '@mui/material';
-import { Send as SendIcon, AttachFile } from '@mui/icons-material';
+import { Send as SendIcon, AttachFile, Stop as StopIcon } from '@mui/icons-material';
 import { myAITeamApi } from '../../api/myaiteam';
 import { wsService } from '../../api/websocket';
 import FileMessage from './FileMessage';
@@ -17,9 +17,10 @@ const Message = ({ message, isUser }) => (
             sx={{
                 p: 2,
                 maxWidth: '70%',
-                backgroundColor: isUser ? 'primary.main' : 'background.paper',
-                color: isUser ? 'primary.contrastText' : 'text.primary',
-                borderRadius: isUser ? '20px 20px 5px 20px' : '20px 20px 20px 5px'
+                backgroundColor: isUser ? 'primary.main' : '#1a237e',
+                color: 'primary.contrastText',
+                borderRadius: isUser ? '20px 20px 5px 20px' : '20px 20px 20px 5px',
+                wordBreak: 'break-word'
             }}
         >
             <Typography variant="body1">{message.content}</Typography>
@@ -40,6 +41,7 @@ const ChatWindow = ({ selectedAgent }) => {
     const [page, setPage] = useState(1);
     const messagesContainerRef = useRef(null);
     const fileInputRef = useRef(null);
+    const [currentChatId, setCurrentChatId] = useState(null);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -56,11 +58,18 @@ const ChatWindow = ({ selectedAgent }) => {
                 try {
                     setIsLoading(true);
                     const response = await myAITeamApi.getChatHistory(selectedAgent.id, {
-                        page: 1,
                         limit: MESSAGES_PER_PAGE
                     });
-                    setMessages(response.messages);
-                    setHasMore(response.hasMore);
+                    
+                    if (response.messages.length > 0) {
+                        setMessages(response.messages);
+                        setCurrentChatId(response.chatId);
+                    } else {
+                        setMessages([]);
+                        setCurrentChatId(null);
+                    }
+                    
+                    setHasMore(response.messages.length >= MESSAGES_PER_PAGE);
                     setPage(1);
                     setError(null);
                 } catch (err) {
@@ -76,6 +85,7 @@ const ChatWindow = ({ selectedAgent }) => {
             setMessages([]);
             setHasMore(true);
             setPage(1);
+            setCurrentChatId(null);
         }
     }, [selectedAgent]);
 
@@ -156,15 +166,25 @@ const ChatWindow = ({ selectedAgent }) => {
         setError(null);
 
         try {
-            const response = await myAITeamApi.sendMessage(selectedAgent.id, inputMessage);
+            const response = await myAITeamApi.sendMessage(
+                selectedAgent.id, 
+                inputMessage, 
+                currentChatId
+            );
             
-            const agentResponse = {
-                content: response.reply,
-                isUser: false,
-                timestamp: new Date()
-            };
-
-            setMessages(prev => [...prev, agentResponse]);
+            if (response.chatId) {
+                setCurrentChatId(response.chatId);
+            }
+            
+            if (response.reply) {
+                const agentResponse = {
+                    content: response.reply,
+                    isUser: false,
+                    timestamp: new Date(),
+                    chatId: response.chatId
+                };
+                setMessages(prev => [...prev, agentResponse]);
+            }
         } catch (error) {
             setError('Failed to send message. Please try again.');
             console.error('Error sending message:', error);
@@ -212,6 +232,17 @@ const ChatWindow = ({ selectedAgent }) => {
         }
     };
 
+    const handleAbortMessage = async () => {
+        if (selectedAgent && currentChatId) {
+            try {
+                await myAITeamApi.abortMessage(selectedAgent.id, currentChatId);
+                setIsLoading(false);
+            } catch (error) {
+                console.error('Error aborting message:', error);
+            }
+        }
+    };
+
     const renderMessage = (message) => {
         if (message.type === 'file') {
             return <FileMessage key={message.timestamp} file={message.content} isUser={message.isUser} />;
@@ -220,33 +251,55 @@ const ChatWindow = ({ selectedAgent }) => {
     };
 
     return (
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Box 
+            sx={{ 
+                height: 'calc(100vh - 240px)', // Adjust height to account for header and padding
+                display: 'flex', 
+                flexDirection: 'column',
+                position: 'relative' // Add this for proper positioning
+            }}
+        >
             {error && (
-                <Alert severity="error" sx={{ m: 2 }}>
+                <Alert severity="error" sx={{ m: 2, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 1 }}>
                     {error}
                 </Alert>
             )}
+            
             <Box
                 ref={messagesContainerRef}
                 onScroll={handleScroll}
                 sx={{
                     flexGrow: 1,
                     overflowY: 'auto',
-                    p: 2,
-                    backgroundColor: 'background.default'
+                    p: 1,
+                    backgroundColor: 'background.default',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1,
+                    '&::-webkit-scrollbar': {
+                        width: '8px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        backgroundColor: 'background.paper',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: 'grey.400',
+                        borderRadius: '4px',
+                    }
                 }}
             >
                 {isLoading && hasMore && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, position: 'sticky', top: 0, zIndex: 1 }}>
                         <CircularProgress size={24} />
                     </Box>
                 )}
+                
                 {!selectedAgent ? (
                     <Typography variant="body1" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
                         Select an agent to start chatting
                     </Typography>
                 ) : (
-                    <>
+                    <Box sx={{ flexGrow: 1, minHeight: 'min-content' }}>
                         {messages.map((message, index) => 
                             renderMessage(message)
                         )}
@@ -258,14 +311,29 @@ const ChatWindow = ({ selectedAgent }) => {
                                 </Typography>
                             </Box>
                         )}
-                    </>
+                    </Box>
                 )}
                 <div ref={messagesEndRef} />
             </Box>
 
-            {/* Input Area */}
-            <Box sx={{ p: 2, backgroundColor: 'background.paper' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Input Area - Make it stick to bottom with minimal spacing */}
+            <Box 
+                sx={{ 
+                    p: 0.5,
+                    backgroundColor: 'background.paper',
+                    borderTop: 1,
+                    borderColor: 'divider',
+                    mt: 'auto'
+                }}
+            >
+                <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1,
+                    '& .MuiInputBase-root': {
+                        py: 0.5
+                    }
+                }}>
                     <input
                         type="file"
                         ref={fileInputRef}
@@ -274,6 +342,7 @@ const ChatWindow = ({ selectedAgent }) => {
                         accept="image/*,.pdf,.doc,.docx,.txt"
                     />
                     <IconButton
+                        size="small"
                         color="primary"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={!selectedAgent || isLoading}
@@ -289,15 +358,43 @@ const ChatWindow = ({ selectedAgent }) => {
                         onKeyPress={handleKeyPress}
                         placeholder={selectedAgent ? "Type your message..." : "Select an agent to start chatting"}
                         disabled={!selectedAgent || isLoading}
-                        sx={{ backgroundColor: 'background.paper' }}
+                        sx={{ 
+                            backgroundColor: 'background.paper',
+                            '& .MuiOutlinedInput-root': {
+                                padding: '8px 14px'
+                            }
+                        }}
                     />
-                    <IconButton 
-                        color="primary" 
-                        onClick={handleSendMessage}
-                        disabled={!selectedAgent || !inputMessage.trim() || isLoading}
-                    >
-                        {isLoading ? <CircularProgress size={24} /> : <SendIcon />}
-                    </IconButton>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {isLoading && (
+                            <>
+                                <IconButton 
+                                    size="small"
+                                    color="error"
+                                    onClick={handleAbortMessage}
+                                    sx={{
+                                        backgroundColor: '#ffebee',
+                                        '&:hover': {
+                                            backgroundColor: '#ffcdd2'
+                                        }
+                                    }}
+                                >
+                                    <StopIcon />
+                                </IconButton>
+                                <CircularProgress size={20} />
+                            </>
+                        )}
+                        {!isLoading && (
+                            <IconButton 
+                                size="small"
+                                color="primary" 
+                                onClick={handleSendMessage}
+                                disabled={!selectedAgent || !inputMessage.trim()}
+                            >
+                                <SendIcon />
+                            </IconButton>
+                        )}
+                    </Box>
                 </Box>
             </Box>
         </Box>

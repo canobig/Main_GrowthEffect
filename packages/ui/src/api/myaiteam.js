@@ -1,52 +1,104 @@
-import api from './api';
+import client from './client';
 
 export const myAITeamApi = {
-    // Fetch all available agents
-    getAgents: async () => {
-        try {
-            const response = await api.get('/api/v1/agents');
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching agents:', error);
-            throw error;
-        }
-    },
-
-    // Send message to an agent
-    sendMessage: async (agentId, message) => {
-        try {
-            const response = await api.post(`/api/v1/chat/${agentId}`, {
-                message
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error sending message:', error);
-            throw error;
-        }
-    },
-
-    // Get chat history for an agent
-    getChatHistory: async (agentId) => {
-        try {
-            const response = await api.get(`/api/v1/chat/${agentId}/history`);
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching chat history:', error);
-            throw error;
-        }
-    },
-
-    uploadFile: async (agentId, formData) => {
-        try {
-            const response = await api.post(`/api/v1/chat/${agentId}/upload`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            return response.data;
-        } catch (error) {
-            console.error('Error uploading file:', error);
-            throw error;
-        }
+  // Get the list of agents (using multiagent chatflows)
+  getAgents: async () => {
+    try {
+      const response = await client.get('/chatflows?type=MULTIAGENT');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching agents:', error);
+      throw error;
     }
-}; 
+  },
+
+  // Send message to an agent
+  sendMessage: async (agentId, message, chatId = null) => {
+    try {
+      const response = await client.post(`/internal-prediction/${agentId}`, {
+        question: message,
+        history: [],
+        chatId: chatId,
+        overrideConfig: {
+          returnSourceDocuments: true
+        }
+      });
+      
+      // The response structure matches the internal prediction endpoint
+      return {
+        reply: response.data.text || response.data.answer,
+        chatId: response.data.chatId
+      };
+    } catch (error) {
+      console.error('Error sending message:', error);
+      throw error;
+    }
+  },
+
+  // Get chat history for an agent
+  getChatHistory: async (agentId, params = {}) => {
+    try {
+      const response = await client.get(`/chatmessage/${agentId}`, {
+        params: {
+          order: 'DESC',
+          feedback: true,
+          ...params
+        }
+      });
+
+      if (!response.data || !Array.isArray(response.data)) {
+        return { messages: [] };
+      }
+
+      // Transform the messages to our format, properly identifying user/agent messages
+      const messages = response.data.map(msg => ({
+        content: msg.question || msg.answer || msg.content,
+        // If msg has a question property, it's a user message
+        isUser: !!msg.question,
+        timestamp: new Date(msg.createdDate),
+        chatId: msg.chatId
+      }));
+
+      // Sort messages by timestamp (oldest first)
+      messages.sort((a, b) => a.timestamp - b.timestamp);
+
+      return {
+        messages,
+        chatId: messages[messages.length - 1]?.chatId
+      };
+    } catch (error) {
+      console.error('Error fetching chat history:', error);
+      throw error;
+    }
+  },
+
+  // Upload a file for the agent
+  uploadFile: async (agentId, formData) => {
+    try {
+      const pathResponse = await client.get('/get-upload-path');
+      const uploadPath = pathResponse.data;
+
+      const response = await client.post(`/upload/${agentId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return {
+        fileUrl: `${uploadPath}/${response.data.filename}`
+      };
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      throw error;
+    }
+  },
+
+  // Abort an ongoing message
+  abortMessage: async (agentId, chatId) => {
+    try {
+      await client.put(`/chatmessage/abort/${agentId}/${chatId}`);
+    } catch (error) {
+      console.error('Error aborting message:', error);
+      throw error;
+    }
+  }
+};
