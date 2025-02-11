@@ -36,6 +36,9 @@ const LoaderConfigPreviewChunks = Loadable(lazy(() => import('@/views/docstore/L
 const VectorStoreConfigure = Loadable(lazy(() => import('@/views/docstore/VectorStoreConfigure')))
 const VectorStoreQuery = Loadable(lazy(() => import('@/views/docstore/VectorStoreQuery')))
 
+// My AI Team routing
+const MyAITeam = Loadable(lazy(() => import('@/views/myaiteam')))
+
 // ==============================|| MAIN ROUTING ||============================== //
 
 const MainRoutes = {
@@ -101,6 +104,10 @@ const MainRoutes = {
         {
             path: '/document-stores/query/:id',
             element: <VectorStoreQuery />
+        },
+        {
+            path: '/myaiteam',
+            element: <MyAITeam />
         }
     ]
 }

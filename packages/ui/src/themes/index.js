@@ -58,14 +58,7 @@ export const theme = (customization) => {
                 }
             }
         },
-        typography: themeTypography(themeOption),
-        palette: {
-            mode: customization.isDarkMode ? 'dark' : 'light',
-            background: {
-                default: customization.isDarkMode ? '#1a223f' : '#f4f6f8',
-                paper: customization.isDarkMode ? '#212946' : '#ffffff'
-            },
-        }
+        typography: themeTypography(themeOption)
     }
 
     const themes = createTheme(themeOptions)

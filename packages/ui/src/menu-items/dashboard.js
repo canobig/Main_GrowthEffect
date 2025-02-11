@@ -32,11 +32,12 @@ const dashboard = {
         },
         {
             id: 'agentflows',
-            title: 'Agent Flows',
+            title: 'Agentflows',
             type: 'item',
             url: '/agentflows',
             icon: icons.IconUsersGroup,
-            breadcrumbs: true
+            breadcrumbs: true,
+            isBeta: false
         },
         {
             id: 'marketplaces',
@@ -62,6 +63,14 @@ const dashboard = {
             icon: icons.IconRobot,
             breadcrumbs: true
         },
+        // {
+        //     id: 'credentials',
+        //     title: 'Credentials',
+        //     type: 'item',
+        //     url: '/credentials',
+        //     icon: icons.IconLock,
+        //     breadcrumbs: true
+        // },
         {
             id: 'variables',
             title: 'Variables',
@@ -70,8 +79,24 @@ const dashboard = {
             icon: icons.IconVariable,
             breadcrumbs: true
         },
+        // {
+        //     id: 'apikey',
+        //     title: 'API Keys',
+        //     type: 'item',
+        //     url: '/apikey',
+        //     icon: icons.IconKey,
+        //     breadcrumbs: true
+        // },
         {
-            id: 'myaiteam',
+            id: 'document-stores',
+            title: 'Document Stores',
+            type: 'item',
+            url: '/document-stores',
+            icon: icons.IconFiles,
+            breadcrumbs: true
+        },
+        {
+            id: 'my-ai-team',
             title: 'My AI Team',
             type: 'item',
             url: '/myaiteam',

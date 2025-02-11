@@ -1,102 +1,51 @@
-import { useState } from 'react';
-import { Box, Grid, Typography, useTheme } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Grid, Typography } from '@mui/material';
+import MainCard from 'ui-component/cards/MainCard';
 import AgentList from './AgentList';
 import ChatWindow from './ChatWindow';
 
 const LAST_SELECTED_AGENT_KEY = 'lastSelectedAgent';
 
 const MyAITeam = () => {
-    const theme = useTheme();
     const [selectedAgent, setSelectedAgent] = useState(null);
 
+    // Load last selected agent from localStorage
+    useEffect(() => {
+        const lastAgent = localStorage.getItem(LAST_SELECTED_AGENT_KEY);
+        if (lastAgent) {
+            try {
+                setSelectedAgent(JSON.parse(lastAgent));
+            } catch (error) {
+                console.error('Error parsing last selected agent:', error);
+            }
+        }
+    }, []);
+
+    const handleSelectAgent = (agent) => {
+        setSelectedAgent(agent);
+        localStorage.setItem(LAST_SELECTED_AGENT_KEY, JSON.stringify(agent));
+    };
+
     return (
-        <Box 
-            sx={{ 
-                position: 'relative',
-                height: {
-                    xs: 'calc(100vh - 56px)', // Mobile height
-                    sm: 'calc(100vh - 64px)', // Tablet height
-                    md: 'calc(100vh - 88px)'  // Desktop height
-                },
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column'
-            }}
-        >
-            <Grid 
-                container 
-                sx={{ 
-                    flexGrow: 1,
-                    height: '100%',
-                    overflow: 'hidden'
-                }}
-            >
+        <MainCard>
+            <Grid container spacing={2} sx={{ height: 'calc(100vh - 180px)' }}>
                 {/* Agent List Panel */}
-                <Grid 
-                    item 
-                    xs={12} 
-                    md={3} 
-                    sx={{ 
-                        borderRight: '1px solid',
-                        borderColor: theme.palette.divider,
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        bgcolor: 'background.paper'
-                    }}
-                >
-                    <Box sx={{ 
-                        p: 3,
-                        borderBottom: '1px solid',
-                        borderColor: theme.palette.divider
-                    }}>
-                        <Typography 
-                            variant="h4" 
-                            sx={{ 
-                                fontWeight: 600,
-                                color: theme.palette.mode === 'dark' ? 'text.primary' : '#1E293B'
-                            }}
-                        >
-                            My Agents
-                        </Typography>
-                    </Box>
-                    <Box sx={{ 
-                        flexGrow: 1,
-                        overflow: 'auto',
-                        p: 2
-                    }}>
-                        <AgentList 
-                            onSelectAgent={setSelectedAgent}
-                            selectedAgent={selectedAgent}
-                        />
-                    </Box>
+                <Grid item xs={12} md={3} sx={{ borderRight: '1px solid', borderColor: 'divider' }}>
+                    <Typography variant="h4" mb={2}>
+                        My Agents
+                    </Typography>
+                    <AgentList 
+                        onSelectAgent={handleSelectAgent}
+                        selectedAgent={selectedAgent}
+                    />
                 </Grid>
                 
                 {/* Chat Panel */}
-                <Grid 
-                    item 
-                    xs={12} 
-                    md={9} 
-                    sx={{ 
-                        height: '100%',
-                        bgcolor: 'background.paper',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        overflow: 'hidden'
-                    }}
-                >
-                    <Box sx={{ 
-                        flexGrow: 1,
-                        overflow: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        p: { xs: 2, md: 3 }
-                    }}>
-                        <ChatWindow selectedAgent={selectedAgent} />
-                    </Box>
+                <Grid item xs={12} md={9}>
+                    <ChatWindow selectedAgent={selectedAgent} />
                 </Grid>
             </Grid>
-        </Box>
+        </MainCard>
     );
 };
 

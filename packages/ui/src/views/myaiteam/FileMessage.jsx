@@ -1,5 +1,5 @@
 import { Box, Paper, Typography, Link } from '@mui/material';
-import { Description, Image } from '@mui/icons-material';
+import { AttachFile, Image } from '@mui/icons-material';
 
 const FileMessage = ({ file, isUser }) => {
     const isImage = file.type.startsWith('image/');
@@ -22,34 +22,37 @@ const FileMessage = ({ file, isUser }) => {
                 }}
             >
                 {isImage ? (
-                    <Box sx={{ maxWidth: '300px' }}>
+                    <Box sx={{ maxWidth: '100%' }}>
                         <img 
                             src={file.url} 
                             alt={file.name}
                             style={{ 
-                                width: '100%', 
-                                height: 'auto',
-                                borderRadius: '4px'
-                            }} 
+                                maxWidth: '100%', 
+                                borderRadius: '8px',
+                                cursor: 'pointer'
+                            }}
+                            onClick={() => window.open(file.url, '_blank')}
                         />
+                        <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+                            {file.name}
+                        </Typography>
                     </Box>
                 ) : (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Description />
-                        <Link 
-                            href={file.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{ 
-                                color: isUser ? 'inherit' : 'primary.main',
-                                '&:hover': {
-                                    textDecoration: 'underline'
-                                }
-                            }}
-                        >
-                            {file.name}
-                        </Link>
-                    </Box>
+                    <Link 
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center',
+                            gap: 1,
+                            color: 'inherit',
+                            textDecoration: 'none'
+                        }}
+                    >
+                        <AttachFile />
+                        <Typography>{file.name}</Typography>
+                    </Link>
                 )}
             </Paper>
         </Box>

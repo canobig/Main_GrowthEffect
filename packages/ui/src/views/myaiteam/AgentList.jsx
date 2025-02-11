@@ -1,30 +1,58 @@
 import { useState, useEffect } from 'react';
-import { List, ListItem, ListItemButton, ListItemText, ListItemAvatar, Avatar, Alert, Box, CircularProgress, Typography, IconButton } from '@mui/material';
-import { SmartToyOutlined, Refresh } from '@mui/icons-material';
-import { alpha } from '@mui/material/styles';
-import { myAITeamApi } from '@/api/myaiteam';
+import { List, ListItem, ListItemButton, ListItemText, ListItemAvatar, Avatar, Alert, Box, CircularProgress, Typography } from '@mui/material';
+import { SmartToyOutlined } from '@mui/icons-material';
+import { myAITeamApi } from '../../api/myaiteam';
+import { wsService } from '../../api/websocket';
 
 const AgentList = ({ onSelectAgent, selectedAgent }) => {
     const [agents, setAgents] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const fetchAgents = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const fetchedAgents = await myAITeamApi.getAgents();
-            setAgents(fetchedAgents || []);
-        } catch (err) {
-            setError('Failed to load agents. Please try again later.');
-            console.error('Error fetching agents:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
+    useEffect(() => {
+        const fetchAgents = async () => {
+            try {
+                setLoading(true);
+                const fetchedAgents = await myAITeamApi.getAgents();
+                setAgents(fetchedAgents);
+                setError(null);
+            } catch (err) {
+                setError('Failed to load agents. Please try again later.');
+                console.error('Error fetching agents:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAgents();
+    }, []);
 
     useEffect(() => {
-        fetchAgents();
+        wsService.connect();
+
+        const handleNewAgent = (agent) => {
+            setAgents(prev => [...prev, agent]);
+        };
+
+        const handleAgentUpdate = (updatedAgent) => {
+            setAgents(prev => prev.map(agent => 
+                agent.id === updatedAgent.id ? updatedAgent : agent
+            ));
+        };
+
+        const handleAgentRemove = (agentId) => {
+            setAgents(prev => prev.filter(agent => agent.id !== agentId));
+        };
+
+        wsService.on('agent:created', handleNewAgent);
+        wsService.on('agent:updated', handleAgentUpdate);
+        wsService.on('agent:removed', handleAgentRemove);
+
+        return () => {
+            wsService.off('agent:created', handleNewAgent);
+            wsService.off('agent:updated', handleAgentUpdate);
+            wsService.off('agent:removed', handleAgentRemove);
+        };
     }, []);
 
     if (loading) {
@@ -37,83 +65,33 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
 
     if (error) {
         return (
-            <Box sx={{ p: 2 }}>
-                <Alert 
-                    severity="error" 
-                    action={
-                        <IconButton
-                            color="inherit"
-                            size="small"
-                            onClick={fetchAgents}
-                        >
-                            <Refresh fontSize="small" />
-                        </IconButton>
-                    }
-                >
-                    {error}
-                </Alert>
-            </Box>
+            <Alert severity="error" sx={{ m: 2 }}>
+                {error}
+            </Alert>
         );
     }
 
     return (
         <List sx={{ width: '100%' }}>
             {agents.length === 0 ? (
-                <Typography 
-                    variant="body2" 
-                    sx={{ 
-                        textAlign: 'center', 
-                        color: 'text.secondary', 
-                        p: 2,
-                        fontStyle: 'italic'
-                    }}
-                >
+                <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', p: 2 }}>
                     No agents available
                 </Typography>
             ) : (
                 agents.map((agent) => (
-                    <ListItem 
-                        key={agent.id} 
-                        disablePadding
-                        sx={{ mb: 1 }}
-                    >
+                    <ListItem key={agent.id} disablePadding>
                         <ListItemButton 
                             selected={selectedAgent?.id === agent.id}
                             onClick={() => onSelectAgent(agent)}
-                            sx={{
-                                borderRadius: 1,
-                                '&.Mui-selected': {
-                                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
-                                    '&:hover': {
-                                        bgcolor: (theme) => alpha(theme.palette.primary.main, 0.16),
-                                    }
-                                },
-                                '&:hover': {
-                                    bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
-                                }
-                            }}
                         >
                             <ListItemAvatar>
-                                <Avatar
-                                    sx={{
-                                        bgcolor: (theme) => alpha(theme.palette.primary.main, 0.12),
-                                        color: 'primary.main'
-                                    }}
-                                >
+                                <Avatar>
                                     <SmartToyOutlined />
                                 </Avatar>
                             </ListItemAvatar>
                             <ListItemText 
-                                primary={
-                                    <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                                        {agent.name}
-                                    </Typography>
-                                }
-                                secondary={
-                                    <Typography variant="body2" color="text.secondary">
-                                        {agent.type} - {agent.description}
-                                    </Typography>
-                                }
+                                primary={agent.name}
+                                secondary={agent.description}
                             />
                         </ListItemButton>
                     </ListItem>

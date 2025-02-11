@@ -2,13 +2,14 @@ import React from 'react'
 import App from '@/App'
 import { store } from '@/store'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import * as serviceWorker from './serviceWorker'
 
 // style + assets
 import '@/assets/scss/style.scss'
 
 // third party
-import { BrowserRouter } from 'react-router-dom'
-import { Provider } from 'react-redux'
 import { SnackbarProvider } from 'notistack'
 import ConfirmContextProvider from '@/store/context/ConfirmContextProvider'
 import { ReactFlowContext } from '@/store/context/ReactFlowContext'
@@ -31,3 +32,5 @@ root.render(
         </Provider>
     </React.StrictMode>
 )
+
+serviceWorker.unregister()

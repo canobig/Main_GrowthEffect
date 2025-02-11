@@ -1,34 +1,24 @@
 class WebSocketService {
     constructor() {
-        this.ws = null;
+        this.socket = null;
         this.listeners = new Map();
     }
 
     connect() {
-        if (this.ws?.readyState === WebSocket.OPEN) return;
+        if (this.socket?.readyState === WebSocket.OPEN) return;
 
-        const wsUrl = process.env.NODE_ENV === 'development' 
-            ? 'ws://localhost:3000/ws'
-            : `ws://${window.location.host}/ws`;
+        // Use the same host as the API but with ws:// or wss:// protocol
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        this.socket = new WebSocket(`${protocol}//${host}/ws`);
 
-        this.ws = new WebSocket(wsUrl);
-
-        this.ws.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                const listeners = this.listeners.get(data.type) || [];
-                listeners.forEach(callback => callback(data.payload));
-            } catch (error) {
-                console.error('WebSocket message error:', error);
-            }
+        this.socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const listeners = this.listeners.get(data.type) || [];
+            listeners.forEach(callback => callback(data.payload));
         };
 
-        this.ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
-
-        this.ws.onclose = () => {
-            console.log('WebSocket closed');
+        this.socket.onclose = () => {
             // Attempt to reconnect after 5 seconds
             setTimeout(() => this.connect(), 5000);
         };
@@ -50,9 +40,9 @@ class WebSocketService {
         }
     }
 
-    send(type, payload) {
-        if (this.ws?.readyState === WebSocket.OPEN) {
-            this.ws.send(JSON.stringify({ type, payload }));
+    emit(type, payload) {
+        if (this.socket?.readyState === WebSocket.OPEN) {
+            this.socket.send(JSON.stringify({ type, payload }));
         }
     }
 }

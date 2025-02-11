@@ -4,7 +4,28 @@ import { Send as SendIcon, AttachFile } from '@mui/icons-material';
 import { myAITeamApi } from '../../api/myaiteam';
 import { wsService } from '../../api/websocket';
 import FileMessage from './FileMessage';
-import Message from './Message';
+
+const Message = ({ message, isUser }) => (
+    <Box
+        sx={{
+            display: 'flex',
+            justifyContent: isUser ? 'flex-end' : 'flex-start',
+            mb: 2
+        }}
+    >
+        <Paper
+            sx={{
+                p: 2,
+                maxWidth: '70%',
+                backgroundColor: isUser ? 'primary.main' : 'background.paper',
+                color: isUser ? 'primary.contrastText' : 'text.primary',
+                borderRadius: isUser ? '20px 20px 5px 20px' : '20px 20px 20px 5px'
+            }}
+        >
+            <Typography variant="body1">{message.content}</Typography>
+        </Paper>
+    </Box>
+);
 
 const MESSAGES_PER_PAGE = 20;
 
@@ -28,13 +49,6 @@ const ChatWindow = ({ selectedAgent }) => {
         scrollToBottom();
     }, [messages]);
 
-    useEffect(() => {
-        console.log('Selected agent changed:', selectedAgent); // Debug log
-        // Clear messages when agent changes
-        setMessages([]);
-        setError(null);
-    }, [selectedAgent]);
-
     // Load initial chat history
     useEffect(() => {
         if (selectedAgent) {
@@ -48,9 +62,10 @@ const ChatWindow = ({ selectedAgent }) => {
                     setMessages(response.messages);
                     setHasMore(response.hasMore);
                     setPage(1);
+                    setError(null);
                 } catch (err) {
-                    console.error('Error loading chat history:', err);
                     setError('Failed to load chat history');
+                    console.error('Error loading chat history:', err);
                 } finally {
                     setIsLoading(false);
                 }
@@ -129,7 +144,6 @@ const ChatWindow = ({ selectedAgent }) => {
     const handleSendMessage = async () => {
         if (!inputMessage.trim() || !selectedAgent) return;
 
-        console.log('Sending message to agent:', selectedAgent.id); // Debug log
         const userMessage = {
             content: inputMessage,
             isUser: true,
@@ -142,25 +156,18 @@ const ChatWindow = ({ selectedAgent }) => {
         setError(null);
 
         try {
-            const response = await myAITeamApi.sendMessage(
-                selectedAgent.id,
-                inputMessage,
-                selectedAgent.type
-            );
+            const response = await myAITeamApi.sendMessage(selectedAgent.id, inputMessage);
             
-            console.log('Agent response:', response); // Debug log
-
             const agentResponse = {
                 content: response.reply,
-                sourceDocuments: response.sourceDocuments,
                 isUser: false,
                 timestamp: new Date()
             };
 
             setMessages(prev => [...prev, agentResponse]);
         } catch (error) {
-            console.error('Error sending message:', error);
             setError('Failed to send message. Please try again.');
+            console.error('Error sending message:', error);
         } finally {
             setIsLoading(false);
         }
@@ -205,6 +212,13 @@ const ChatWindow = ({ selectedAgent }) => {
         }
     };
 
+    const renderMessage = (message) => {
+        if (message.type === 'file') {
+            return <FileMessage key={message.timestamp} file={message.content} isUser={message.isUser} />;
+        }
+        return <Message key={message.timestamp} message={message} isUser={message.isUser} />;
+    };
+
     return (
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             {error && (
@@ -233,13 +247,9 @@ const ChatWindow = ({ selectedAgent }) => {
                     </Typography>
                 ) : (
                     <>
-                        {messages.map((message, index) => (
-                            message.type === 'file' ? (
-                                <FileMessage key={index} file={message.content} isUser={message.isUser} />
-                            ) : (
-                                <Message key={index} message={message} />
-                            )
-                        ))}
+                        {messages.map((message, index) => 
+                            renderMessage(message)
+                        )}
                         {isAgentTyping && (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}>
                                 <CircularProgress size={16} />

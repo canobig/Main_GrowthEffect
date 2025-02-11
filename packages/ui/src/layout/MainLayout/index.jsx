@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 
 // material-ui
 import { styled, useTheme } from '@mui/material/styles'
@@ -9,21 +9,24 @@ import { AppBar, Box, CssBaseline, Toolbar, useMediaQuery } from '@mui/material'
 // project imports
 import Header from './Header'
 import Sidebar from './Sidebar'
-import { drawerWidth } from '@/store/constant'
+import { drawerWidth, headerHeight } from '@/store/constant'
 import { SET_MENU } from '@/store/actions'
+import MyAITeam from '@/views/myaiteam'
 
 // styles
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
     ...theme.typography.mainContent,
     ...(!open && {
+        backgroundColor: 'transparent',
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
-        transition: theme.transitions.create('margin', {
+        transition: theme.transitions.create('all', {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.shorter
+            duration: theme.transitions.duration.leavingScreen
         }),
+        marginRight: 0,
         [theme.breakpoints.up('md')]: {
-            marginLeft: -(drawerWidth - 20),
+            marginLeft: -drawerWidth,
             width: `calc(100% - ${drawerWidth}px)`
         },
         [theme.breakpoints.down('md')]: {
@@ -39,46 +42,36 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({
         }
     }),
     ...(open && {
-        transition: theme.transitions.create('margin', {
+        backgroundColor: 'transparent',
+        transition: theme.transitions.create('all', {
             easing: theme.transitions.easing.easeOut,
-            duration: theme.transitions.duration.shorter
+            duration: theme.transitions.duration.enteringScreen
         }),
         marginLeft: 0,
+        marginRight: 0,
         borderBottomLeftRadius: 0,
         borderBottomRightRadius: 0,
-        width: `calc(100% - ${drawerWidth}px)`,
-        [theme.breakpoints.down('md')]: {
-            marginLeft: '20px'
-        },
-        [theme.breakpoints.down('sm')]: {
-            marginLeft: '10px'
-        }
+        width: `calc(100% - ${drawerWidth}px)`
     })
-}));
+}))
 
 // ==============================|| MAIN LAYOUT ||============================== //
 
 const MainLayout = () => {
     const theme = useTheme()
-    const location = useLocation()
-    const matchDownMd = useMediaQuery(theme.breakpoints.down('md'))
-    const dispatch = useDispatch()
-    const [leftDrawerOpened, setLeftDrawerOpened] = useState(true)
+    const matchDownMd = useMediaQuery(theme.breakpoints.down('lg'))
 
+    // Handle left drawer
+    const leftDrawerOpened = useSelector((state) => state.customization.opened)
+    const dispatch = useDispatch()
     const handleLeftDrawerToggle = () => {
-        setLeftDrawerOpened(!leftDrawerOpened)
+        dispatch({ type: SET_MENU, opened: !leftDrawerOpened })
     }
 
     useEffect(() => {
-        dispatch({ type: SET_MENU, opened: !matchDownMd })
+        setTimeout(() => dispatch({ type: SET_MENU, opened: !matchDownMd }), 0)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [matchDownMd])
-
-    // Close drawer on mobile when route changes
-    useEffect(() => {
-        if (matchDownMd && leftDrawerOpened) {
-            setLeftDrawerOpened(false)
-        }
-    }, [location.pathname])
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -86,15 +79,15 @@ const MainLayout = () => {
             {/* header */}
             <AppBar
                 enableColorOnDark
-                position="fixed"
-                color="inherit"
+                position='fixed'
+                color='inherit'
                 elevation={0}
                 sx={{
                     bgcolor: theme.palette.background.default,
                     transition: leftDrawerOpened ? theme.transitions.create('width') : 'none'
                 }}
             >
-                <Toolbar>
+                <Toolbar sx={{ height: `${headerHeight}px`, borderBottom: '1px solid', borderColor: theme.palette.primary[200] + 75 }}>
                     <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
                 </Toolbar>
             </AppBar>
@@ -104,9 +97,7 @@ const MainLayout = () => {
 
             {/* main content */}
             <Main theme={theme} open={leftDrawerOpened}>
-                <Box sx={{ pt: '64px' }}>
-                    <Outlet />
-                </Box>
+                <Outlet />
             </Main>
         </Box>
     )

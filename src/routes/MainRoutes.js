@@ -1,4 +1,0 @@
-{
-    path: '/myaiteam',
-    element: <MyAITeam />
-} 
