@@ -99,8 +99,7 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: '550px', // Fixed height for scrolling
-        // border: '1px solid #ccc', // Removed border line
+        height: '100%'
       }}
     >
       <TextField
@@ -112,7 +111,7 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
           mb: 2,
           '& .MuiOutlinedInput-root': {
             backgroundColor: 'background.paper',
-          },
+          }
         }}
         InputProps={{
           startAdornment: (
@@ -125,10 +124,8 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
 
       <List
         sx={{
-          width: '100%',
           flexGrow: 1,
-          overflowY: 'auto', // Enables vertical scrolling
-          position: 'relative',
+          overflowY: 'auto',
           '&::-webkit-scrollbar': {
             width: '8px',
           },
@@ -141,7 +138,7 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
           },
           '& .MuiListItem-root': {
             py: 0.5,
-          },
+          }
         }}
       >
         {filteredAgents.length === 0 ? (

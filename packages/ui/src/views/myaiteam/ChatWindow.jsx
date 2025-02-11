@@ -269,10 +269,11 @@ const ChatWindow = ({ selectedAgent }) => {
     return (
         <Box 
             sx={{ 
-                height: 'calc(100vh - 100px)', // Increased height by reducing the subtraction
-                display: 'flex', 
+                display: 'flex',
                 flexDirection: 'column',
-                position: 'relative'
+                height: '100%',
+                position: 'relative',
+                overflow: 'hidden' // Prevent any unwanted scrolling
             }}
         >
             {error && (
@@ -281,6 +282,7 @@ const ChatWindow = ({ selectedAgent }) => {
                 </Alert>
             )}
             
+            {/* Messages Container */}
             <Box
                 ref={messagesContainerRef}
                 onScroll={handleScroll}
@@ -291,9 +293,6 @@ const ChatWindow = ({ selectedAgent }) => {
                     backgroundColor: 'background.default',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 2,
-                    position: 'relative',
-                    maxHeight: 'calc(100vh - 160px)', // Adjusted to match new container height
                     '&::-webkit-scrollbar': {
                         width: '8px',
                     },
@@ -325,10 +324,6 @@ const ChatWindow = ({ selectedAgent }) => {
                                 backgroundColor: 'background.paper',
                                 '&:hover': {
                                     backgroundColor: '#ffebee'
-                                },
-                                opacity: 0.8,
-                                '&:hover': {
-                                    opacity: 1
                                 }
                             }}
                         >
@@ -336,52 +331,63 @@ const ChatWindow = ({ selectedAgent }) => {
                         </IconButton>
                     </Box>
                 )}
-                
-                {isLoading && hasMore && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 2, position: 'sticky', top: 0, zIndex: 1 }}>
-                        <CircularProgress size={24} />
-                    </Box>
-                )}
-                
-                {!selectedAgent ? (
-                    <Typography variant="body1" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
-                        Select an agent to start chatting
-                    </Typography>
-                ) : (
-                    <Box sx={{ flexGrow: 1, minHeight: 'min-content' }}>
-                        {messages.map((message, index) => 
-                            renderMessage(message)
-                        )}
-                        {isAgentTyping && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}>
-                                <CircularProgress size={16} />
-                                <Typography variant="body2" color="text.secondary">
-                                    Agent is typing...
-                                </Typography>
-                            </Box>
-                        )}
-                    </Box>
-                )}
+
+                {/* Messages or Empty States */}
+                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                    {!selectedAgent ? (
+                        <Box sx={{ 
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            alignItems: 'center',
+                            flexGrow: 1
+                        }}>
+                            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                                Select an agent to start chatting
+                            </Typography>
+                        </Box>
+                    ) : messages.length === 0 ? (
+                        <Box sx={{ 
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            alignItems: 'center',
+                            flexGrow: 1
+                        }}>
+                            <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                                No messages yet. Start a conversation!
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <>
+                            {messages.map((message, index) => 
+                                renderMessage(message)
+                            )}
+                            {isAgentTyping && (
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2 }}>
+                                    <CircularProgress size={16} />
+                                    <Typography variant="body2" color="text.secondary">
+                                        Agent is typing...
+                                    </Typography>
+                                </Box>
+                            )}
+                        </>
+                    )}
+                </Box>
                 <div ref={messagesEndRef} />
             </Box>
 
-            {/* Input Area - Keep it compact at the bottom */}
+            {/* Input Area */}
             <Box 
                 sx={{ 
-                    p: 0.5,
+                    p: 1.5,
                     backgroundColor: 'background.paper',
                     borderTop: 1,
-                    borderColor: 'divider',
-                    minHeight: '60px', // Ensure consistent height for input area
+                    borderColor: 'divider'
                 }}
             >
                 <Box sx={{ 
                     display: 'flex', 
                     alignItems: 'center', 
-                    gap: 1,
-                    '& .MuiInputBase-root': { // Reduce TextField padding
-                        py: 0.5
-                    }
+                    gap: 1
                 }}>
                     <input
                         type="file"
@@ -391,7 +397,7 @@ const ChatWindow = ({ selectedAgent }) => {
                         accept="image/*,.pdf,.doc,.docx,.txt"
                     />
                     <IconButton
-                        size="small" // Make buttons slightly smaller
+                        size="small"
                         color="primary"
                         onClick={() => fileInputRef.current?.click()}
                         disabled={!selectedAgent || isLoading}
@@ -410,7 +416,7 @@ const ChatWindow = ({ selectedAgent }) => {
                         sx={{ 
                             backgroundColor: 'background.paper',
                             '& .MuiOutlinedInput-root': {
-                                padding: '8px 14px' // Reduce internal padding
+                                padding: '8px 14px'
                             }
                         }}
                     />
@@ -430,7 +436,7 @@ const ChatWindow = ({ selectedAgent }) => {
                                 >
                                     <StopIcon />
                                 </IconButton>
-                                <CircularProgress size={20} /> {/* Slightly smaller loading indicator */}
+                                <CircularProgress size={20} />
                             </>
                         )}
                         {!isLoading && (

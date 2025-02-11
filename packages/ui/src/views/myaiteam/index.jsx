@@ -29,45 +29,52 @@ const MyAITeam = () => {
     return (
         <MainCard 
             sx={{ 
-                height: '100vh',
-                position: 'fixed',
-                zIndex: 1,
-                mt: 0,
+                height: 'calc(100vh - 88px)', // Header height'ını çıkarıyoruz
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                overflow: 'hidden',
+                border: 'none',
+                boxShadow: 'none',
+                '& .MuiCardContent-root': {
+                    height: '100%',
+                    p: 0
+                }
             }}
         >
             <Grid 
                 container 
-                spacing={0}
                 sx={{ 
-                    height: '100%',   
-                    overflow: 'hidden' // Grid içinde taşma olmasın
+                    height: '100%',
+                    overflow: 'hidden'
                 }}
             >
-                {/* SOL PANEL: Agent List */}
+                {/* Left Panel: Agent List */}
                 <Grid 
                     item 
                     xs={12} 
                     md={3} 
                     sx={{ 
-                        borderRight: '1px solid', 
+                        borderRight: '1px solid',
                         borderColor: 'divider',
                         height: '100%',
                         display: 'flex',
-                        flexDirection: 'column',
-                        overflowY: 'auto', // Sadece sol panelde scroll
-                        pt: 2
+                        flexDirection: 'column'
                     }}
                 >
-                    <Typography variant="h4" sx={{ mb: 2, px: 1 }}>
+                    <Typography 
+                        variant="h4" 
+                        sx={{ 
+                            p: 2,
+                            pb: 1
+                        }}
+                    >
                         My Agents
                     </Typography>
                     <Box 
                         sx={{ 
                             flexGrow: 1,
-                            overflowY: 'auto', 
-                            px: 1
+                            overflow: 'hidden',
+                            px: 2
                         }}
                     >
                         <AgentList 
@@ -77,28 +84,16 @@ const MyAITeam = () => {
                     </Box>
                 </Grid>
                 
-                {/* SAĞ PANEL: Chat Window (Scroll'u KAPATTIK) */}
+                {/* Right Panel: Chat Window */}
                 <Grid 
                     item 
                     xs={12} 
                     md={9} 
                     sx={{ 
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        overflow: 'hidden', // Sayfanın scroll olmasını engelle
+                        height: '100%'
                     }}
                 >
-                    <Box 
-                        sx={{ 
-                            flexGrow: 1, 
-                            overflow: 'hidden', // ChatWindow'un scroll olmaması için
-                            display: 'flex',
-                            flexDirection: 'column'
-                        }}
-                    >
-                        <ChatWindow selectedAgent={selectedAgent} />
-                    </Box>
+                    <ChatWindow selectedAgent={selectedAgent} />
                 </Grid>
             </Grid>
         </MainCard>
