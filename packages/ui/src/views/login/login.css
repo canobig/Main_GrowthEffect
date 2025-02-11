@@ -157,3 +157,16 @@ form button:hover {
     font-weight: bold;
     margin-top: 10px;
 }
+
+.forgot-password-btn {
+    background: none;
+    border: none;
+    color: #5a67d8;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.forgot-password-btn:hover {
+    text-decoration: underline;
+}

@@ -4,10 +4,10 @@ import jwt from 'jsonwebtoken';
 import { Response } from 'express';
 
 function generateToken() {
-    const secretKey = "sanatcilarsitesi";
+    const secretKey = process.env.SECRET_KEY;
     const expiresIn = "1h";
   
-    const token = jwt.sign({}, secretKey, { expiresIn });
+    const token = jwt.sign({}, secretKey? secretKey:"", { expiresIn });
     return token;
   }
 
