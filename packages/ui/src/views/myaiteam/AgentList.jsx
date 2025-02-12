@@ -26,7 +26,7 @@ import {
   FormControlLabel,
   Divider
 } from '@mui/material';
-import { SmartToyOutlined, Chat as ChatIcon, Search as SearchIcon, ExpandLess, ExpandMore, Folder as FolderIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, MoreVert as MoreVertIcon, ViewList as ViewListIcon, ViewModule as ViewModuleIcon, CheckBox, CheckBoxOutlineBlank, Star as StarIcon, StarBorder as StarBorderIcon } from '@mui/icons-material';
+import { SmartToyOutlined, Chat as ChatIcon, Search as SearchIcon, ExpandLess, ExpandMore, Folder as FolderIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, MoreVert as MoreVertIcon, ViewList as ViewListIcon, ViewModule as ViewModuleIcon, CheckBox, CheckBoxOutlineBlank, Star as StarIcon, StarBorder as StarBorderIcon, Archive as ArchiveIcon, Unarchive as UnarchiveIcon } from '@mui/icons-material';
 import { myAITeamApi } from '../../api/myaiteam';
 import { wsService } from '../../api/websocket';
 
@@ -152,6 +152,11 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
     return saved ? JSON.parse(saved) : [];
   });
   const [favoritesAnchorEl, setFavoritesAnchorEl] = useState(null);
+  const [archivedAgents, setArchivedAgents] = useState(() => {
+    const saved = localStorage.getItem('archivedAgents');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [showArchived, setShowArchived] = useState(false);
 
   useEffect(() => {
     const fetchAgents = async () => {
@@ -213,12 +218,18 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
     localStorage.setItem('favoriteAgents', JSON.stringify(favorites));
   }, [favorites]);
 
-  const filteredAgents = agents.filter(
-    (agent) =>
-      agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (agent.description &&
-        agent.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  useEffect(() => {
+    localStorage.setItem('archivedAgents', JSON.stringify(archivedAgents));
+  }, [archivedAgents]);
+
+  const filteredAgents = useMemo(() => {
+    return agents.filter(agent => {
+      const matchesSearch = agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (agent.description && agent.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesArchiveState = showArchived ? archivedAgents.includes(agent.id) : !archivedAgents.includes(agent.id);
+      return matchesSearch && matchesArchiveState;
+    });
+  }, [agents, searchQuery, archivedAgents, showArchived]);
 
   const handleToggleGroup = (groupName) => {
     setOpenGroups(prev => ({
@@ -297,6 +308,17 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
 
   const isFavorite = (agentId) => favorites.includes(agentId);
 
+  const toggleArchive = (agentId) => {
+    setArchivedAgents(prev => {
+      if (prev.includes(agentId)) {
+        return prev.filter(id => id !== agentId);
+      }
+      return [...prev, agentId];
+    });
+  };
+
+  const isArchived = (agentId) => archivedAgents.includes(agentId);
+
   const sortedAgents = useMemo(() => {
     return filteredAgents.sort((a, b) => {
       const aFav = isFavorite(a.id);
@@ -374,7 +396,10 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
     <ListItem 
       key={agent.id} 
       disablePadding 
-      sx={{ pl: inGroup ? 4 : 0 }}
+      sx={{ 
+        pl: inGroup ? 4 : 0,
+        opacity: isArchived(agent.id) ? 0.7 : 1
+      }}
     >
       <ListItemButton
         selected={selectedAgent?.id === agent.id}
@@ -395,12 +420,18 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
         </ListItemAvatar>
         <ListItemText 
           primary={
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Typography>{agent.name}</Typography>
               {isFavorite(agent.id) && (
                 <StarIcon 
                   fontSize="small" 
-                  sx={{ color: 'warning.main', ml: 1 }}
+                  sx={{ color: 'warning.main' }}
+                />
+              )}
+              {isArchived(agent.id) && (
+                <ArchiveIcon 
+                  fontSize="small" 
+                  sx={{ color: 'text.secondary' }}
                 />
               )}
             </Box>
@@ -498,7 +529,7 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
             </IconButton>
           )}
         </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
           <IconButton
             size="small"
             onClick={(e) => setFavoritesAnchorEl(e.currentTarget)}
@@ -510,6 +541,18 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
             }}
           >
             <StarIcon fontSize="small" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => setShowArchived(!showArchived)}
+            sx={{
+              color: showArchived ? 'primary.main' : 'action.active',
+              '&:hover': {
+                bgcolor: 'action.hover'
+              }
+            }}
+          >
+            {showArchived ? <UnarchiveIcon fontSize="small" /> : <ArchiveIcon fontSize="small" />}
           </IconButton>
           <ViewToggle 
             isGroupedView={isGroupedView} 
@@ -662,6 +705,21 @@ const AgentList = ({ onSelectAgent, selectedAgent }) => {
             )}
           </ListItemIcon>
           {isFavorite(selectedAgentForMenu?.id) ? 'Remove from Favorites' : 'Add to Favorites'}
+        </MenuItem>
+        <MenuItem 
+          onClick={() => {
+            toggleArchive(selectedAgentForMenu.id);
+            handleAgentMenuClose();
+          }}
+        >
+          <ListItemIcon>
+            {isArchived(selectedAgentForMenu?.id) ? (
+              <UnarchiveIcon fontSize="small" />
+            ) : (
+              <ArchiveIcon fontSize="small" />
+            )}
+          </ListItemIcon>
+          {isArchived(selectedAgentForMenu?.id) ? 'Unarchive' : 'Archive'}
         </MenuItem>
         <Divider />
         <MenuItem disabled sx={{ opacity: 1, fontWeight: 500 }}>
