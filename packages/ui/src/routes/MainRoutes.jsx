@@ -28,6 +28,9 @@ const Credentials = Loadable(lazy(() => import('@/views/credentials')))
 // variables routing
 const Variables = Loadable(lazy(() => import('@/views/variables')))
 
+// token usage routing
+const TokenUsage = Loadable(lazy(() => import('@/views/token-usage')))
+
 // documents routing
 const Documents = Loadable(lazy(() => import('@/views/docstore')))
 const DocumentStoreDetail = Loadable(lazy(() => import('@/views/docstore/DocumentStoreDetail')))
@@ -60,6 +63,10 @@ const MainRoutes = {
         {
             path: '/marketplaces',
             element: <Marketplaces />
+        },
+        {
+            path: '/token-usage',
+            element: <TokenUsage />
         },
         // {
         //     path: '/apikey',

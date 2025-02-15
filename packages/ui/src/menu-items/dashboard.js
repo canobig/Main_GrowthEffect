@@ -9,11 +9,24 @@ import {
     IconRobot,
     IconVariable,
     IconFiles,
-    IconUsers
+    IconUsers,
+    IconChartBar
 } from '@tabler/icons-react'
 
 // constant
-const icons = { IconUsersGroup, IconHierarchy, IconBuildingStore, IconKey, IconTool, IconLock, IconRobot, IconVariable, IconFiles, IconUsers }
+const icons = {
+    IconUsersGroup,
+    IconHierarchy,
+    IconBuildingStore,
+    IconKey,
+    IconTool,
+    IconLock,
+    IconRobot,
+    IconVariable,
+    IconFiles,
+    IconUsers,
+    IconChartBar
+}
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
 
@@ -46,6 +59,14 @@ const dashboard = {
             icon: icons.IconUsersGroup,
             breadcrumbs: true,
             isBeta: false
+        },
+        {
+            id: 'token-usage',
+            title: 'Token Usage',
+            type: 'item',
+            url: '/token-usage',
+            icon: icons.IconChartBar,
+            breadcrumbs: true
         },
         {
             id: 'marketplaces',
