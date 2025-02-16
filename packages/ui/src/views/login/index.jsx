@@ -76,7 +76,7 @@ const Login = () => {
                     <button type='submit'>Login</button>
                 </form>
                 <button className="forgot-password-btn" onClick={handleForgotPassword}>
-                    Forgot Password
+                    Forgot Password?
                 </button>
                 <div className='message'>
                     {message}

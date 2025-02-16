@@ -54,7 +54,7 @@ const login = async (userEmail: string, userPass: string, res: Response): Promis
     } catch (error) {
         return {
             status: StatusCodes.INTERNAL_SERVER_ERROR,
-            message: 'Error: loginService.login - ${getErrorMessage(error)}'
+            message: 'Error: loginService.login - ${getErrorMessage('+ error +')}'
         }
     }
 }
