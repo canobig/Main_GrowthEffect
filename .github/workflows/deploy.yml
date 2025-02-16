@@ -1,0 +1,40 @@
+name: Deploy to AWS EC2  # İş akışının adı
+
+on:
+  push:
+    branches:
+      - dev  # Sadece 'dev' branch'ine commit atıldığında çalışır
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # GitHub, Ubuntu üzerinde bu işlemi çalıştırır
+
+    steps:
+      - name: Checkout code  # Kodu GitHub'dan al
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js  # Node.js ortamını hazırla
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies  # Bağımlılıkları yükle
+        run: npm install
+
+      - name: Run Tests  # (Opsiyonel) Testleri çalıştır
+        run: npm test
+
+      - name: Deploy to AWS EC2 via SSH
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  # GitHub Secrets üzerinden alınacak
+          HOST: ${{ secrets.EC2_HOST }}
+          USER: ec2-user
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $USER@$HOST << 'EOF'
+            cd /home/ec2-user/myapp  # Projenin olduğu dizine git
+            git pull origin dev  # En son kodları çek
+            npm install  # Bağımlılıkları yükle
+            pm2 restart all  # Uygulamayı yeniden başlat
+          EOF
