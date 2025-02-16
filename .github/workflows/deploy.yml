@@ -33,7 +33,7 @@ jobs:
           echo "$PRIVATE_KEY" > private_key.pem
           chmod 600 private_key.pem
           ssh -o StrictHostKeyChecking=no -i private_key.pem $USER@$HOST << 'EOF'
-            cd /home/ec2-user/myapp  # Projenin olduğu dizine git
+            cd /home/ec2-user  # Projenin olduğu dizine git
             git pull origin dev  # En son kodları çek
             npm install  # Bağımlılıkları yükle
             pm2 restart all  # Uygulamayı yeniden başlat
