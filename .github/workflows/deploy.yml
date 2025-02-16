@@ -19,7 +19,7 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies  # Bağımlılıkları yükle
-        run: npm install --legacy-peer-deps
+        run: npm ci --legacy-peer-deps
 
       - name: Run Tests  # (Opsiyonel) Testleri çalıştır
         run: npm test
