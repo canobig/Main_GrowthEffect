@@ -4,10 +4,10 @@ import jwt from 'jsonwebtoken';
 import { Response } from 'express';
 
 function generateToken() {
-    const secretKey = "sanatcilarsitesi";
+    const secretKey = process.env.SECRET_KEY;
     const expiresIn = "1h";
   
-    const token = jwt.sign({}, secretKey, { expiresIn });
+    const token = jwt.sign({}, secretKey? secretKey:"", { expiresIn });
     return token;
   }
 
@@ -54,7 +54,7 @@ const login = async (userEmail: string, userPass: string, res: Response): Promis
     } catch (error) {
         return {
             status: StatusCodes.INTERNAL_SERVER_ERROR,
-            message: 'Error: loginService.login - ${getErrorMessage(error)}'
+            message: 'Error: loginService.login - ${getErrorMessage('+ error +')}'
         }
     }
 }

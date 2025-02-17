@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import { useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { createPortal } from 'react-dom'
+import { useCookies } from 'react-cookie'
 
 // material-ui
 import {
@@ -145,6 +146,19 @@ const ExportDialog = ({ show, onCancel, onExport }) => {
     return createPortal(component, portalElement)
 }
 
+const handleLogout = () => {
+    localStorage.clear();
+
+    document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+            .replace(/^ +/, "")
+            .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`);
+    });
+    const [, , removeCookie] = useCookies(['authToken']);
+    removeCookie('authToken', { path: '/' });
+    navigate('/login');
+};
+
 ExportDialog.propTypes = {
     show: PropTypes.bool,
     onCancel: PropTypes.func,
@@ -153,7 +167,7 @@ ExportDialog.propTypes = {
 
 // ==============================|| PROFILE MENU ||============================== //
 
-const ProfileSection = ({ username, handleLogout }) => {
+const ProfileSection = ({ username }) => {
     const theme = useTheme()
 
     const customization = useSelector((state) => state.customization)
@@ -407,19 +421,7 @@ const ProfileSection = ({ username, handleLogout }) => {
                                                     <ListItemText primary={<Typography variant='body2'>Import</Typography>} />
                                                 </ListItemButton>
                                                 <input ref={inputRef} type='file' hidden onChange={fileChange} accept='.json' />
-                                                <ListItemButton
-                                                    sx={{ borderRadius: `${customization.borderRadius}px` }}
-                                                    onClick={() => {
-                                                        setOpen(false)
-                                                        setAboutDialogOpen(true)
-                                                    }}
-                                                >
-                                                    <ListItemIcon>
-                                                        <IconInfoCircle stroke={1.5} size='1.3rem' />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant='body2'>About Flowise</Typography>} />
-                                                </ListItemButton>
-                                                {localStorage.getItem('username') && localStorage.getItem('password') && (
+                                                {useCookies(['authToken']) && (
                                                     <ListItemButton
                                                         sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                         onClick={handleLogout}
